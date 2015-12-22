@@ -1,8 +1,12 @@
 var falsey=not(truthy);
+var ObjProto=Object.prototype;
+var ArrayProto=Array.prototype;
+var slice=ArrayProto.slice;
+var toString=ObjProto.toString;
 function existy(x){return x!=null};
 function truthy(x){return existy(x)&&x!==false;};
-function isFunction(x){return Object.prototype.toString.call(x)=='[object Function]';};
-function toArray(x){return [].slice.call(x);};
+function isFunction(x){return toString.call(x)=='[object Function]';};
+function toArray(x){return slice.call(x);};
 function not(fn){
 	return function(){
 		var args=toArray(arguments);
@@ -44,3 +48,17 @@ function pluck(key){
 		return target?target[key]:undefined;
 	}
 }
+
+when('')
+.then(3)
+.then(function(x){
+
+  return x*3
+})
+.then(function(){
+
+})
+.otherwise(function(){
+  return 99
+})
+.value()
