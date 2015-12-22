@@ -11,12 +11,14 @@ var not=function(fn){
 };
 var when=function(cond){
 	var value;
+	var done=truthy(cond);
+	var fail=falsey(cond);
 	var then=function(fn){
-		if(truthy(cond)) value=isFunction(fn)?fn(value):fn;
+		if(done) value=isFunction(fn)?fn(value):fn;
 		return then;
 	};
 	var otherwise=function(fn){
-		if(falsey(cond)) value=isFunction(fn)?fn(value):fn;
+		if(fail) value=isFunction(fn)?fn(value):fn;
 		return otherwise;
 	};
 	then.value=otherwise.value=function(){
@@ -39,6 +41,6 @@ var dispatch=function(){
 };
 var pluck=function(key){
 	return function(target){
-		return target?target[key]:target;
+		return target?target[key]:undefined;
 	}
 };
