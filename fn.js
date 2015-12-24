@@ -1,22 +1,28 @@
-var existy=function(x){return x!=null};
-var truthy=function(x){return existy(x)&&x!==false;};
-var isFunction=function(x){return Object.prototype.toString.call(x)=='[object Function]';};
-var toArray=function(x){return [].slice.call(x);};
 var falsey=not(truthy);
-var not=function(fn){
+var ObjProto=Object.prototype;
+var ArrayProto=Array.prototype;
+var slice=ArrayProto.slice;
+var toString=ObjProto.toString;
+function existy(x){return x!=null}
+function truthy(x){return existy(x)&&x!==false;}
+function isFunction(x){return toString.call(x)=='[object Function]';}
+function toArray(x){return slice.call(x);}
+function not(fn){
 	return function(){
 		var args=toArray(arguments);
 		return !fn.apply(null,args);
 	};
-};
-var when=function(cond){
+}
+function when(cond){
 	var value;
+	var done=truthy(cond);
+	var fail=falsey(cond);
 	var then=function(fn){
-		if(truthy(cond)) value=isFunction(fn)?fn(value):fn;
+		if(done) value=isFunction(fn)?fn(value):fn;
 		return then;
 	};
 	var otherwise=function(fn){
-		if(falsey(cond)) value=isFunction(fn)?fn(value):fn;
+		if(fail) value=isFunction(fn)?fn(value):fn;
 		return otherwise;
 	};
 	then.value=otherwise.value=function(){
@@ -25,8 +31,8 @@ var when=function(cond){
 	then.then=otherwise.then=then;
 	otherwise.otherwise=then.otherwise=otherwise;
 	return then;
-};
-var dispatch=function(){
+}
+function dispatch(){
 	var args=toArray(arguments);
 	return function(){
 		var ret;
@@ -36,9 +42,9 @@ var dispatch=function(){
 		}
 		return ret;
 	};
-};
-var pluck=function(key){
+}
+function pluck(key){
 	return function(target){
-		return target?target[key]:target;
+		return target?target[key]:undefined;
 	}
-};
+}
