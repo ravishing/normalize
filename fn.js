@@ -1,6 +1,6 @@
-;
-! function(factory, root) {
-    root.f = factory.call(this);
+;void function(factory, root) {
+	// console.log(root)
+    root.f = factory.call(root);
 }(function() {
     'use strict'
     //nativeFn
@@ -16,6 +16,7 @@
     var __forEach = ArrayProto.forEach;
     //isType
     var falsey = not(truthy);
+    var nothingify = not(existy);
     var isFunction = isType('Function');
     var isArray = Array.isArray || isType('Array');
     var isString = isType('String');
@@ -212,14 +213,14 @@
     }
 
     function aliasFor(obj) {
-        var aliasFor=function(oldname) {
+        var alias=function(oldname) {
             function fn(newname) {
                 obj[newname] = obj[oldname];
                 return fn;
             }
             return fn.is = fn.are = fn.and = fn;
         };
-        return aliasFor.aliasFor=aliasFor;
+        return alias.alias=alias;
     }
 
     function forEach() {
@@ -268,6 +269,8 @@
         toArray: toArray,
         existy: existy,
         truthy: truthy,
+        falsey:falsey,
+        nothingify:nothingify,
         not: not,
         fail: fail,
         warn: warn,
@@ -276,30 +279,30 @@
     };
 
     var aliasOn__map__=__map__.aliasFor(__map__);
-    aliasOn__map__.aliasFor('reduce').is('reduceLeft').and('folder');
-    aliasOn__map__.aliasFor('each').is('forEach');
+    aliasOn__map__.alias('reduce').is('reduceLeft').and('folder');
+    aliasOn__map__.alias('each').is('forEach');
     return __map__;
 }, this);
 
 
 
 
-f.map('fdsafsad', f.identity);
-f.reduce('123456789', function(seed, v, k, l) {
-    seed = seed + v;
-    return seed;
-}, 0);
-var rule = {
-    type: 'display',
-    message: 'hi'
-};
-var validate1 = f.validator(function(x) {
-    if (x.type == 'display') return false
-    else return true;
-}, '不能为display', true);
-var validate2 = f.validator(function(x) {
-    if (x.message == 'hi') return true;
-    else return false;
-}, '不能为hi', false);
-var check1 = f.checkor(validate1, validate2);
-check1(rule);
+// f.map('fdsafsad', f.identity);
+// f.reduce('123456789', function(seed, v, k, l) {
+//     seed = seed + v;
+//     return seed;
+// }, 0);
+// var rule = {
+//     type: 'display',
+//     message: 'hi'
+// };
+// var validate1 = f.validator(function(x) {
+//     if (x.type == 'display') return false
+//     else return true;
+// }, '不能为display', true);
+// var validate2 = f.validator(function(x) {
+//     if (x.message == 'hi') return true;
+//     else return false;
+// }, '不能为hi', false);
+// var check1 = f.checkor(validate1, validate2);
+// check1(rule);
