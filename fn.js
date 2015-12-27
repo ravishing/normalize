@@ -13,6 +13,7 @@
     var has=ObjProto.hasOwnProperty;
     var __map = ArrayProto.map;
     var __reduce = ArrayProto.reduce;
+    var __reduceRight=ArrayProto.reduceRight;
     var __forEach = ArrayProto.forEach;
     //isType
     var falsey = not(truthy);
@@ -23,8 +24,9 @@
     var isNumber = isType('Number');
 
     //closure
-    var map = dispatch(invoker('map', _map), _map);
-    var reduce = dispatch(invoker('reduce', _reduce), _reduce);
+    var map = dispatch(invoker('map', __map), _map);
+    var reduce = dispatch(invoker('reduce', __reduce), _reduce);
+    var reduceRight =dispatch(invoker('reduceRight',__reduceRight),_reduceRight)
     var each = dispatch(forEach, _forEach);
 
     //
@@ -112,6 +114,23 @@
         for (var i = 0, l = array.length; i < l; ++i) {
             seed = cb.call(context, seed, array[i], i, array)
         }
+        return seed;
+    }
+
+
+    function _reduceRight(array, cb, seed, context) {
+        array = toArray(array);
+        if (!isFunction(cb)) {
+            return array[array.length - 1];
+        }
+        if (!existy(seed)) {
+            seed = array.shift();
+        }
+        var l=array.length;
+        while(l--){
+        	seed = cb.call(context, seed, array[i], i, array)
+        }
+
         return seed;
     }
 
@@ -242,9 +261,17 @@
         return array;
     }
 
+    function extend(target,resource){
+    	for(var i in resource){
+    		if(has.call(resource,i)){
+    			target[i]=resource[i];
+    		}
+    	}
+    }
     var __map__ = {
         map: map,
         reduce: reduce,
+        reduceRight:reduceRight,
         each: each,
         isFunction: isFunction,
         isArray: isArray,
@@ -275,13 +302,17 @@
         fail: fail,
         warn: warn,
         note: note,
-        aliasFor: aliasFor
+        aliasFor: aliasFor,
+        extend:extend
     };
 
+    var f=function(){};
     var aliasOn__map__=__map__.aliasFor(__map__);
-    aliasOn__map__.alias('reduce').is('reduceLeft').and('folder');
+    aliasOn__map__.alias('reduce').is('reduceLeft').and('fold').are('foldLeft');
     aliasOn__map__.alias('each').is('forEach');
-    return __map__;
+    aliasOn__map__.alias('reduceRight').is('foldRight');
+    extend(f,__map__);
+    return f;
 }, this);
 
 
