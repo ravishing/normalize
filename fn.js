@@ -1,16 +1,19 @@
-;!function(factory,root) {
-    root.f=factory.call(this);
+;
+! function(factory, root) {
+    root.f = factory.call(this);
 }(function() {
     'use strict'
     //nativeFn
-    var _Array=Array;
-    var _Object=Object;
-    var ObjProto = _Object.prototype;
-    var ArrayProto = _Array.prototype;
+    var __Array = Array;
+    var __Object = Object;
+    var ObjProto = __Object.prototype;
+    var ArrayProto = __Array.prototype;
     var slice = ArrayProto.slice;
     var toString = ObjProto.toString;
+    var has=ObjProto.hasOwnProperty;
     var __map = ArrayProto.map;
     var __reduce = ArrayProto.reduce;
+    var __forEach = ArrayProto.forEach;
     //isType
     var falsey = not(truthy);
     var isFunction = isType('Function');
@@ -21,14 +24,17 @@
     //closure
     var map = dispatch(invoker('map', _map), _map);
     var reduce = dispatch(invoker('reduce', _reduce), _reduce);
+    var each = dispatch(forEach, _forEach);
 
     //
     function fail(thing) {
         throw new Error(thing);
     }
+
     function warn() {
         console.info(['WARNING:', thing].join(' '));
     }
+
     function note() {
         console.log(['NOTE:', thing].join(' '));
     }
@@ -37,6 +43,7 @@
     function existy(x) {
         return x != null
     }
+
     function truthy(x) {
         return existy(x) && x !== false;
     }
@@ -44,6 +51,7 @@
     function toArray(x) {
         return existy(x) ? slice.call(x) : [];
     }
+
     function first(x) {
         return nth(x, 0);
     }
@@ -57,15 +65,18 @@
         y.shift();
         return y;
     }
+
     function nth(x, key) {
         return isIndexed(x) ? x[key] : undefined;
     }
+
     function not(fn) {
         return function() {
             var args = toArray(arguments);
             return !fn.apply(null, args);
         };
     }
+
     function cat() {
         var args = toArray(arguments);
         var head = first(args);
@@ -74,6 +85,7 @@
         else
             return [];
     }
+
     function construct(head, tail) {
         return cat([head], toArray(tail));
     }
@@ -87,6 +99,7 @@
         }
         return result;
     }
+
     function _reduce(array, cb, seed, context) {
         array = toArray(array);
         if (!isFunction(cb)) {
@@ -101,9 +114,10 @@
         return seed;
     }
 
-	function isIndexed(x) {
+    function isIndexed(x) {
         return isArray(x) || isString(x);
     }
+
     function isType(x) {
         return function(y) {
             return toString.call(y) == '[object ' + x + ']';
@@ -135,6 +149,7 @@
             return x
         }
     };
+
     function identity(x) {
         return x
     };
@@ -145,17 +160,18 @@
             var ret;
             for (var i = 0, l = args.length; i < l; ++i) {
                 ret = args[i].apply(null, toArray(arguments))
-                console.log(toArray(arguments), i)
                 if (existy(ret)) return ret;
             }
             return ret;
         };
     }
+
     function pluck(key) {
         return function(target) {
             return target ? target[key] : undefined;
         }
     }
+
     function fnull(fn) {
         var defaults = rest(fn);
         return function() {
@@ -167,12 +183,14 @@
             return fn.apply(null, args);
         }
     }
+
     function invoker(key, method) {
         return function(target) {
             if (existy(target) && isFunction(target[key]) && target[key] === method) return method.apply(target, rest(arguments));
             return;
         }
     }
+
     function validator(fn, error, failure) {
         var wapper = function(x) {
             return isFunction(fn) ? fn(x) : undefined;
@@ -181,6 +199,7 @@
         wapper.error = error;
         return wapper;
     }
+
     function checkor(validators) {
         var validators = toArray(arguments);
         return function() {
@@ -192,39 +211,75 @@
         }
     }
 
-    var __map__={
-    	map:map,
-    	reduce:reduce,
-    	isFunction:isFunction,
-    	isArray:isArray,
-    	isString:isString,
-    	isNumber:isNumber,
-    	isIndexed:isIndexed,
-    	cat:cat,
-    	construct:construct,
-    	validator:validator,
-    	checkor:checkor,
-    	invoker:invoker,
-    	nth:nth,
-    	first:first,
-    	rest:rest,
-    	second:second,
-    	pluck:pluck,
-    	dispatch:dispatch,
-    	fnull:fnull,
-    	when:when,
-    	always:always,
-    	identity:identity,
-    	toArray:toArray,
-    	existy:existy,
-    	truthy:truthy,
-    	not:not,
-    	fail:fail,
-    	warn:warn,
-    	note:note
+    function aliasFor(obj) {
+        var aliasFor=function(oldname) {
+            function fn(newname) {
+                obj[newname] = obj[oldname];
+                return fn;
+            }
+            return fn.is = fn.are = fn.and = fn;
+        };
+        return aliasFor.aliasFor=aliasFor;
     }
+
+    function forEach() {
+        var head = first(arguments);
+        if (existy(head) && head.forEach && head.forEach === __each) {
+            invoker('forEach', __forEach).apply(null, arguments);
+            return head;
+        } else {
+            return;
+        }
+    }
+
+    function _forEach(array, cb, context) {
+        array = toArray(array);
+        if (!isFunction(cb)) return array;
+        for (var i = 0, l = array.length; i < l; ++i) {
+            cb.call(context, array[i], i, array)
+        }
+        return array;
+    }
+
+    var __map__ = {
+        map: map,
+        reduce: reduce,
+        each: each,
+        isFunction: isFunction,
+        isArray: isArray,
+        isString: isString,
+        isNumber: isNumber,
+        isIndexed: isIndexed,
+        cat: cat,
+        construct: construct,
+        validator: validator,
+        checkor: checkor,
+        invoker: invoker,
+        nth: nth,
+        first: first,
+        rest: rest,
+        second: second,
+        pluck: pluck,
+        dispatch: dispatch,
+        fnull: fnull,
+        when: when,
+        always: always,
+        identity: identity,
+        toArray: toArray,
+        existy: existy,
+        truthy: truthy,
+        not: not,
+        fail: fail,
+        warn: warn,
+        note: note,
+        aliasFor: aliasFor
+    };
+
+    var aliasOn__map__=__map__.aliasFor(__map__);
+    aliasOn__map__.aliasFor('reduce').is('reduceLeft').and('folder');
+    aliasOn__map__.aliasFor('each').is('forEach');
     return __map__;
-},this);
+}, this);
 
 
 
