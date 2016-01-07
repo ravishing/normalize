@@ -1,9 +1,9 @@
 ;void function(factory, root) {
 	// console.log(root)
-    root.f = factory.call(root);
+    root._f = factory.call(root);
 }(function() {
     'use strict'
-    //nativeFn
+    //native code
     var __Array = Array;
     var __Object = Object;
     var ObjProto = __Object.prototype;
@@ -15,6 +15,7 @@
     var __reduce = ArrayProto.reduce;
     var __reduceRight=ArrayProto.reduceRight;
     var __forEach = ArrayProto.forEach;
+
     //isType
     var falsey = not(truthy);
     var nothingify = not(existy);
@@ -23,55 +24,32 @@
     var isString = isType('String');
     var isNumber = isType('Number');
 
-    //closure
+    //closure and combinor
     var map = dispatch(invoker('map', __map), _map);
     var reduce = dispatch(invoker('reduce', __reduce), _reduce);
-    var reduceRight =dispatch(invoker('reduceRight',__reduceRight),_reduceRight)
+    var reduceRight =dispatch(invoker('reduceRight',__reduceRight),_reduceRight);
     var each = dispatch(forEach, _forEach);
 
-    //
-    function fail(thing) {
-        throw new Error(thing);
-    }
+    //two underscore means native code,one underscore means poly;
+    function fail(thing) { throw new Error(thing); }
 
-    function warn() {
-        console.info(['WARNING:', thing].join(' '));
-    }
+    function warn() { console.info(['WARNING:', thing].join(' ')); }
 
-    function note() {
-        console.log(['NOTE:', thing].join(' '));
-    }
+    function note() { console.log(['NOTE:', thing].join(' ')); }
 
+    function existy(x) {  return x != null; }
 
-    function existy(x) {
-        return x != null
-    }
+    function truthy(x) {  return existy(x) && x !== false; }
 
-    function truthy(x) {
-        return existy(x) && x !== false;
-    }
+    function toArray(x) {  return existy(x) ? slice.call(x) : []; }
 
-    function toArray(x) {
-        return existy(x) ? slice.call(x) : [];
-    }
+    function first(x) { return nth(x, 0); }
 
-    function first(x) {
-        return nth(x, 0);
-    }
+    function second(x) { return nth(x, 1); }
 
-    function second(x) {
-        return nth(x, 1);
-    }
+    function rest(x) { return toArray(x).slice(1); }
 
-    function rest(x) {
-        var y = toArray(x);
-        y.shift();
-        return y;
-    }
-
-    function nth(x, key) {
-        return isIndexed(x) ? x[key] : undefined;
-    }
+    function nth(x, key) { return isIndexed(x) ? x[key] : undefined; }
 
     function not(fn) {
         return function() {
@@ -89,9 +67,7 @@
             return [];
     }
 
-    function construct(head, tail) {
-        return cat([head], toArray(tail));
-    }
+    function construct(head, tail) { return cat([head], toArray(tail)); }
 
 
     function _map(target, iterator, context) {
@@ -134,9 +110,7 @@
         return seed;
     }
 
-    function isIndexed(x) {
-        return isArray(x) || isString(x);
-    }
+    function isIndexed(x) { return isArray(x) || isString(x); }
 
     function isType(x) {
         return function(y) {
@@ -170,9 +144,7 @@
         }
     };
 
-    function identity(x) {
-        return x
-    };
+    function identity(x) { return x };
 
     function dispatch() {
         var args = toArray(arguments);
@@ -268,6 +240,7 @@
     		}
     	}
     }
+    //member table
     var __map__ = {
         map: map,
         reduce: reduce,
@@ -306,12 +279,26 @@
         extend:extend
     };
 
+    //namespace and constuctor
     var f=function(){};
-    var aliasOn__map__=__map__.aliasFor(__map__);
-    aliasOn__map__.alias('reduce').is('reduceLeft').and('fold').are('foldLeft');
-    aliasOn__map__.alias('each').is('forEach');
-    aliasOn__map__.alias('reduceRight').is('foldRight');
+
+    //member alias
+    var aliasFor__map__=__map__.aliasFor(__map__);
+
+
+    aliasFor__map__.alias('reduce')
+    .is('reduceLeft')
+    .and('fold')
+    .are('foldLeft');
+
+    aliasFor__map__.alias('each')
+    .is('forEach');
+
+    aliasFor__map__.alias('reduceRight')
+    .is('foldRight');
+
     extend(f,__map__);
+    
     return f;
 }, this);
 
