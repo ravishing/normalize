@@ -18,6 +18,7 @@
     var __filter=ArrayProto.filter;
     var __some=ArrayProto.some;
     var __every=ArrayProto.every;
+    var __has=ObjProto.hasOwnProperty;
 
     //isType
     var falsey = not(truthy);
@@ -43,6 +44,11 @@
 
     function note() { console.log(['NOTE:', thing].join(' ')); }
 
+
+    function has(obj,key){
+        __has.call(obj,key);
+    }
+
     function existy(x) {  return x != null; }
 
     function truthy(x) {  return existy(x) && x !== false; }
@@ -52,6 +58,21 @@
     function first(x) { return nth(x, 0); }
 
     function second(x) { return nth(x, 1); }
+
+    function curry1(fn){
+        return function(arg){
+            return fn.call(null,arg);
+        }
+    }
+
+    function partial1(){
+        var fn=_.first(arguments);
+        var args=_.rest(arguments);
+        return function(){
+            var arg=cat(args,arguments);
+            return fn.apply(null,arg);
+        }
+    }
 
     function rest(x) { return toArray(x).slice(1); }
 
@@ -285,6 +306,9 @@
     }
     //member table
     var __map__ = {
+        has:has,
+        curry1:curry1,
+        partial1:partial1,
         map: map,
         reduce: reduce,
         reduceRight:reduceRight,
