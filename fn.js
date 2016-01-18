@@ -15,6 +15,9 @@
     var __reduce = ArrayProto.reduce;
     var __reduceRight=ArrayProto.reduceRight;
     var __forEach = ArrayProto.forEach;
+    var __filter=ArrayProto.filter;
+    var __some=ArrayProto.some;
+    var __every=ArrayProto.every;
 
     //isType
     var falsey = not(truthy);
@@ -29,6 +32,9 @@
     var reduce = dispatch(invoker('reduce', __reduce), _reduce);
     var reduceRight =dispatch(invoker('reduceRight',__reduceRight),_reduceRight);
     var each = dispatch(forEach, _forEach);
+    var filter =dispatch(invoker('filter',__filter),_filter);
+    var some=dispatch(invoker('some',__some),_some);
+    var every=dispatch(invoker('every',__every),_every);
 
     //two underscore means native code,one underscore means poly;
     function fail(thing) { throw new Error(thing); }
@@ -108,6 +114,43 @@
         }
 
         return seed;
+    }
+
+    function _filter(array,fn){
+        var ret=[];
+        var l=array.length;
+        var i=0;
+        while(i<l){
+            if(fn(array[i],i,array)){
+                ret.push(array[i]);
+            }
+            i++;
+        }
+        return ret;
+    }
+
+    function _some(array,fn){
+        var l=array.length;
+        var i=0;
+        while(i<l){
+            if(fn(array[i],i,array)){
+                return true;
+            }
+            i++;
+        }
+        return false;
+    }
+
+    function _every(array,fn){
+        var l=array.length;
+        var i=0;
+        while(i<l){
+            if(!fn(array[i],i,array)){
+                return false;
+            }
+            i++;
+        }
+        return true;
     }
 
     function isIndexed(x) { return isArray(x) || isString(x); }
@@ -246,6 +289,9 @@
         reduce: reduce,
         reduceRight:reduceRight,
         each: each,
+        filter:filter,
+        every:every,
+        some:some,
         isFunction: isFunction,
         isArray: isArray,
         isString: isString,
