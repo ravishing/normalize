@@ -73,30 +73,11 @@ function(factory, root) {
     var Promise = dispatch(__Promise, _Promise);
 
     //two underscore means native code,one underscore means poly;
-
-    var Chain=createClass({
-        invoker:function(){
-            var args=toArray(arguments);
-            this._chains.push(function(value){
-                return value[args[0]].apply(value,args.slice(1));
-            });
-        },
-        value:function(){
-            return reduce(this._chains,function(product,current){
-                return current(product);
-            },this._value);
-        }
-    },function(value){
-        this._value=value;
-        this._chains=[];
-    });
-
     function fail(thing) {throw new Error(thing);}
 
     function warn() {console.info(['WARNING:', thing].join(' '));}
 
     function note() {console.log(['NOTE:', thing].join(' '));}
-
 
     function has(obj, key) {return __has.call(obj, key);}
 
@@ -147,7 +128,6 @@ function(factory, root) {
 
     function construct(head, tail) {return cat([head], toArray(tail));}
 
-
     function _map(target, iterator, context) {
         var result = [];
         target = toArray(target);
@@ -170,7 +150,6 @@ function(factory, root) {
         }
         return seed;
     }
-
 
     function _reduceRight(array, cb, seed, context) {
         array = toArray(array);
@@ -376,8 +355,13 @@ function(factory, root) {
         };
         parent.prototype = parentProto;
         var f = function() {
+            if(!(this instanceof f)){
+                plain.prototype=fProto;
+                return f.apply(new plain,arguments);
+            }
             this.__initIns__.apply(this, arguments);
             this.initialize && this.initialize.apply(this, arguments);
+            return this;
         };
 
         f.__initClass__ = __initClass;
@@ -414,9 +398,39 @@ function(factory, root) {
         }
     }
 
+    var Chain=createClass({
+        invoke:function(){
+            var args=toArray(arguments);
+            this._chains.push(function(value){
+                return value[args[0]].apply(value,args.slice(1));
+            });
+            return this;
+        },
+        value:function(){
+            return reduce(this._chains,function(product,current){
+                return current(product);
+            },this._value);
+        }
+    },function(value){
+        this._value=value;
+        this._chains=[];
+        return this;
+    });
+
     function extend(seed, initialize) {return inherit(seed, this, initialize);}
+    
+    function pipe(){
+        var args=toArray(arguments);
+        return function(){
+            var seed=first(args).apply(null,toArray(arguments));
+            return reduce(args.slice(1),function(product,current){
+                return current.call(null,product);
+            },seed);
+        }
+    }
     //member table
-    var __map__ = {
+    var __map__ = {//46
+        pipe:pipe,
         Chain:Chain,
         has: has,
         curry1: curry1,
@@ -472,15 +486,15 @@ function(factory, root) {
 
 
     aliasFor__map__.alias('reduce')
-        .is('reduceLeft')
-        .and('fold')
-        .are('foldLeft');
+                   .is('reduceLeft')
+                   .and('fold')
+                   .are('foldLeft');
 
     aliasFor__map__.alias('each')
-        .is('forEach');
+                   .is('forEach');
 
     aliasFor__map__.alias('reduceRight')
-        .is('foldRight');
+                   .is('foldRight');
 
     mixin(f, __map__);
 
@@ -492,7 +506,14 @@ function(factory, root) {
 /**
  *test
  */
-var a=new _f.Chain([1,2,3]).invoke('push',4,5,6).invoke('map',alert).value();
+var a=_f.Chain([1,2,3]).invoke('concat',4,5,6).invoke('map',function(value){
+    return value+1;
+}).value();
+var b=_f.pipe(function(a){
+    return a+1
+},function(a){
+    return a+2
+});
 // var a=new _f.Chain([1,2,3]).invoke('push',4,5,6).invoke('map',alert)
 // f.map('fdsafsad', f.identity);
 // f.reduce('123456789', function(seed, v, k, l) {
