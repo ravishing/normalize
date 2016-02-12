@@ -91,42 +91,24 @@ function(factory, root) {
         this._chains=[];
     });
 
-    function fail(thing) {
-        throw new Error(thing);
-    }
+    function fail(thing) {throw new Error(thing);}
 
-    function warn() {
-        console.info(['WARNING:', thing].join(' '));
-    }
+    function warn() {console.info(['WARNING:', thing].join(' '));}
 
-    function note() {
-        console.log(['NOTE:', thing].join(' '));
-    }
+    function note() {console.log(['NOTE:', thing].join(' '));}
 
 
-    function has(obj, key) {
-        return __has.call(obj, key);
-    }
+    function has(obj, key) {return __has.call(obj, key);}
 
-    function existy(x) {
-        return x != null;
-    }
+    function existy(x) {return x != null;}
 
-    function truthy(x) {
-        return existy(x) && x !== false;
-    }
+    function truthy(x) {return existy(x) && x !== false;}
 
-    function toArray(x) {
-        return existy(x) ? slice.call(x) : [];
-    }
+    function toArray(x) {return existy(x) ? slice.call(x) : [];}
 
-    function first(x) {
-        return nth(x, 0);
-    }
+    function first(x) {return nth(x, 0);}
 
-    function second(x) {
-        return nth(x, 1);
-    }
+    function second(x) {return nth(x, 1);}
 
     function curry1(fn) {
         return function(arg) {
@@ -143,13 +125,9 @@ function(factory, root) {
         }
     }
 
-    function rest(x) {
-        return toArray(x).slice(1);
-    }
+    function rest(x) {return toArray(x).slice(1);}
 
-    function nth(x, key) {
-        return isIndexed(x) ? x[key] : undefined;
-    }
+    function nth(x, key) {return isIndexed(x) ? x[key] : undefined;}
 
     function not(fn) {
         return function() {
@@ -167,9 +145,7 @@ function(factory, root) {
             return [];
     }
 
-    function construct(head, tail) {
-        return cat([head], toArray(tail));
-    }
+    function construct(head, tail) {return cat([head], toArray(tail));}
 
 
     function _map(target, iterator, context) {
@@ -249,9 +225,7 @@ function(factory, root) {
         return true;
     }
 
-    function isIndexed(x) {
-        return isArray(x) || isString(x);
-    }
+    function isIndexed(x) {return isArray(x) || isString(x);}
 
     function isType(x) {
         return function(y) {
@@ -285,9 +259,7 @@ function(factory, root) {
         }
     };
 
-    function identity(x) {
-        return x
-    };
+    function identity(x) {return x;}
 
     function dispatch() {
         var args = toArray(arguments);
@@ -442,9 +414,7 @@ function(factory, root) {
         }
     }
 
-    function extend(seed, initialize) {
-        return inherit(seed, this, initialize);
-    }
+    function extend(seed, initialize) {return inherit(seed, this, initialize);}
     //member table
     var __map__ = {
         Chain:Chain,
@@ -522,7 +492,7 @@ function(factory, root) {
 /**
  *test
  */
-var a=new _f.Chain([1,2,3])//.invoke('push',4,5,6).invoke('map',alert)
+var a=new _f.Chain([1,2,3]).invoke('push',4,5,6).invoke('map',alert).value();
 // var a=new _f.Chain([1,2,3]).invoke('push',4,5,6).invoke('map',alert)
 // f.map('fdsafsad', f.identity);
 // f.reduce('123456789', function(seed, v, k, l) {
