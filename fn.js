@@ -23,12 +23,8 @@ function(factory, root) {
     var __every = ArrayProto.every;
     var __has = ObjProto.hasOwnProperty;
 
-
-    var _Promise=function(async){
-        return new Defferd(async).promise;
-    };
     var _Promise=createClass({},function(async,defferd){
-        var defferd=defferd instanceof  Defferd?((defferd.promise=this),defferd):new Defferd(this);
+        defferd=defferd instanceof  Defferd?((defferd.promise=this),defferd):new Defferd(this);
         if(isFunction(async)) async(partial1(defferd.resolve,defferd),partial1(defferd.reject,defferd));
         this.then=function(onFulfilled,onRejected,onProgress){
             if(isFunction(onFulfilled)) defferd.once('success',onFullfilled);
@@ -37,6 +33,10 @@ function(factory, root) {
             return new _Promise;
         };
     });
+
+
+    var Event=createClass({});//to continue
+
     var Defferd=Event.extend({
         resolve:function(obj){
             this.state='fulfilled';
@@ -53,7 +53,6 @@ function(factory, root) {
         this.state='pending';
         this.promise=promise instanceof _Promise?promise:new _Promise(null,this);
     });
-    var Event=createClass({});
 
     //isType
     var falsey = not(truthy);
@@ -74,6 +73,24 @@ function(factory, root) {
     var Promise = dispatch(__Promise, _Promise);
 
     //two underscore means native code,one underscore means poly;
+
+    var Chain=createClass({
+        invoker:function(){
+            var args=toArray(arguments);
+            this._chains.push(function(value){
+                return value[args[0]].apply(value,args.slice(1));
+            });
+        },
+        value:function(){
+            return reduce(this._chains,function(product,current){
+                return current(product);
+            },this._value);
+        }
+    },function(value){
+        this._value=value;
+        this._chains=[];
+    });
+
     function fail(thing) {
         throw new Error(thing);
     }
@@ -88,7 +105,7 @@ function(factory, root) {
 
 
     function has(obj, key) {
-        __has.call(obj, key);
+        return __has.call(obj, key);
     }
 
     function existy(x) {
@@ -430,6 +447,7 @@ function(factory, root) {
     }
     //member table
     var __map__ = {
+        Chain:Chain,
         has: has,
         curry1: curry1,
         partial1: partial1,
@@ -501,7 +519,11 @@ function(factory, root) {
 
 
 
-
+/**
+ *test
+ */
+var a=new _f.Chain([1,2,3])//.invoke('push',4,5,6).invoke('map',alert)
+// var a=new _f.Chain([1,2,3]).invoke('push',4,5,6).invoke('map',alert)
 // f.map('fdsafsad', f.identity);
 // f.reduce('123456789', function(seed, v, k, l) {
 //     seed = seed + v;
