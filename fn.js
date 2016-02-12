@@ -1,24 +1,59 @@
-;void function(factory, root) {
-	// console.log(root)
+;
+void
+function(factory, root) {
+    // console.log(root)
     root._f = factory.call(root);
 }(function() {
     'use strict'
     //native code
-    var __Array = Array;
-    var __Object = Object;
+    var root = this;
+    var __Array = root.Array;
+    var __Object = root.Object;
     var ObjProto = __Object.prototype;
     var ArrayProto = __Array.prototype;
     var slice = ArrayProto.slice;
     var toString = ObjProto.toString;
-    var has=ObjProto.hasOwnProperty;
+    var __Promise = root.Promise;
     var __map = ArrayProto.map;
     var __reduce = ArrayProto.reduce;
-    var __reduceRight=ArrayProto.reduceRight;
+    var __reduceRight = ArrayProto.reduceRight;
     var __forEach = ArrayProto.forEach;
-    var __filter=ArrayProto.filter;
-    var __some=ArrayProto.some;
-    var __every=ArrayProto.every;
-    var __has=ObjProto.hasOwnProperty;
+    var __filter = ArrayProto.filter;
+    var __some = ArrayProto.some;
+    var __every = ArrayProto.every;
+    var __has = ObjProto.hasOwnProperty;
+
+
+    var _Promise=function(async){
+        return new Defferd(async).promise;
+    };
+    var _Promise=createClass({},function(async,defferd){
+        var defferd=defferd instanceof  Defferd?((defferd.promise=this),defferd):new Defferd(this);
+        if(isFunction(async)) async(partial1(defferd.resolve,defferd),partial1(defferd.reject,defferd));
+        this.then=function(onFulfilled,onRejected,onProgress){
+            if(isFunction(onFulfilled)) defferd.once('success',onFullfilled);
+            if(isFunction(onRejected)) defferd.once('success',onRejected);
+            if(isFunction(onProgress)) defferd.once('success',onProgress);
+            return new _Promise;
+        };
+    });
+    var Defferd=Event.extend({
+        resolve:function(obj){
+            this.state='fulfilled';
+            this.trigger('success',obj);
+        },
+        reject:function(error){
+            this.state='rejected';
+            this.trigger('error',error);
+        },
+        progress:function(chunck){
+            this.trigger('progress',chunck);
+        }
+    },function(promise){
+        this.state='pending';
+        this.promise=promise instanceof _Promise?promise:new _Promise(null,this);
+    });
+    var Event=createClass({});
 
     //isType
     var falsey = not(truthy);
@@ -31,52 +66,73 @@
     //closure and combinor
     var map = dispatch(invoker('map', __map), _map);
     var reduce = dispatch(invoker('reduce', __reduce), _reduce);
-    var reduceRight =dispatch(invoker('reduceRight',__reduceRight),_reduceRight);
+    var reduceRight = dispatch(invoker('reduceRight', __reduceRight), _reduceRight);
     var each = dispatch(forEach, _forEach);
-    var filter =dispatch(invoker('filter',__filter),_filter);
-    var some=dispatch(invoker('some',__some),_some);
-    var every=dispatch(invoker('every',__every),_every);
+    var filter = dispatch(invoker('filter', __filter), _filter);
+    var some = dispatch(invoker('some', __some), _some);
+    var every = dispatch(invoker('every', __every), _every);
+    var Promise = dispatch(__Promise, _Promise);
 
     //two underscore means native code,one underscore means poly;
-    function fail(thing) { throw new Error(thing); }
-
-    function warn() { console.info(['WARNING:', thing].join(' ')); }
-
-    function note() { console.log(['NOTE:', thing].join(' ')); }
-
-
-    function has(obj,key){
-        __has.call(obj,key);
+    function fail(thing) {
+        throw new Error(thing);
     }
 
-    function existy(x) {  return x != null; }
+    function warn() {
+        console.info(['WARNING:', thing].join(' '));
+    }
 
-    function truthy(x) {  return existy(x) && x !== false; }
+    function note() {
+        console.log(['NOTE:', thing].join(' '));
+    }
 
-    function toArray(x) {  return existy(x) ? slice.call(x) : []; }
 
-    function first(x) { return nth(x, 0); }
+    function has(obj, key) {
+        __has.call(obj, key);
+    }
 
-    function second(x) { return nth(x, 1); }
+    function existy(x) {
+        return x != null;
+    }
 
-    function curry1(fn){
-        return function(arg){
-            return fn.call(null,arg);
+    function truthy(x) {
+        return existy(x) && x !== false;
+    }
+
+    function toArray(x) {
+        return existy(x) ? slice.call(x) : [];
+    }
+
+    function first(x) {
+        return nth(x, 0);
+    }
+
+    function second(x) {
+        return nth(x, 1);
+    }
+
+    function curry1(fn) {
+        return function(arg) {
+            return fn.call(null, arg);
         }
     }
 
-    function partial1(){
-        var fn=_.first(arguments);
-        var args=_.rest(arguments);
-        return function(){
-            var arg=cat(args,arguments);
-            return fn.apply(null,arg);
+    function partial1() {
+        var fn = _.first(arguments);
+        var args = _.rest(arguments);
+        return function() {
+            var arg = cat(args, arguments);
+            return fn.apply(null, arg);
         }
     }
 
-    function rest(x) { return toArray(x).slice(1); }
+    function rest(x) {
+        return toArray(x).slice(1);
+    }
 
-    function nth(x, key) { return isIndexed(x) ? x[key] : undefined; }
+    function nth(x, key) {
+        return isIndexed(x) ? x[key] : undefined;
+    }
 
     function not(fn) {
         return function() {
@@ -94,7 +150,9 @@
             return [];
     }
 
-    function construct(head, tail) { return cat([head], toArray(tail)); }
+    function construct(head, tail) {
+        return cat([head], toArray(tail));
+    }
 
 
     function _map(target, iterator, context) {
@@ -129,20 +187,20 @@
         if (!existy(seed)) {
             seed = array.shift();
         }
-        var l=array.length;
-        while(l--){
-        	seed = cb.call(context, seed, array[i], i, array)
+        var l = array.length;
+        while (l--) {
+            seed = cb.call(context, seed, array[i], i, array)
         }
 
         return seed;
     }
 
-    function _filter(array,fn){
-        var ret=[];
-        var l=array.length;
-        var i=0;
-        while(i<l){
-            if(fn(array[i],i,array)){
+    function _filter(array, fn) {
+        var ret = [];
+        var l = array.length;
+        var i = 0;
+        while (i < l) {
+            if (fn(array[i], i, array)) {
                 ret.push(array[i]);
             }
             i++;
@@ -150,11 +208,11 @@
         return ret;
     }
 
-    function _some(array,fn){
-        var l=array.length;
-        var i=0;
-        while(i<l){
-            if(fn(array[i],i,array)){
+    function _some(array, fn) {
+        var l = array.length;
+        var i = 0;
+        while (i < l) {
+            if (fn(array[i], i, array)) {
                 return true;
             }
             i++;
@@ -162,11 +220,11 @@
         return false;
     }
 
-    function _every(array,fn){
-        var l=array.length;
-        var i=0;
-        while(i<l){
-            if(!fn(array[i],i,array)){
+    function _every(array, fn) {
+        var l = array.length;
+        var i = 0;
+        while (i < l) {
+            if (!fn(array[i], i, array)) {
                 return false;
             }
             i++;
@@ -174,7 +232,9 @@
         return true;
     }
 
-    function isIndexed(x) { return isArray(x) || isString(x); }
+    function isIndexed(x) {
+        return isArray(x) || isString(x);
+    }
 
     function isType(x) {
         return function(y) {
@@ -208,14 +268,16 @@
         }
     };
 
-    function identity(x) { return x };
+    function identity(x) {
+        return x
+    };
 
     function dispatch() {
         var args = toArray(arguments);
         return function() {
             var ret;
             for (var i = 0, l = args.length; i < l; ++i) {
-                ret = args[i].apply(null, toArray(arguments))
+                ret = isFunction(args[i]) ? args[i].apply(null, toArray(arguments)) : null;
                 if (existy(ret)) return ret;
             }
             return ret;
@@ -268,14 +330,14 @@
     }
 
     function aliasFor(obj) {
-        var alias=function(oldname) {
+        var alias = function(oldname) {
             function fn(newname) {
                 obj[newname] = obj[oldname];
                 return fn;
             }
             return fn.is = fn.are = fn.and = fn;
         };
-        return alias.alias=alias;
+        return alias.alias = alias;
     }
 
     function forEach() {
@@ -297,25 +359,87 @@
         return array;
     }
 
-    function extend(target,resource){
-    	for(var i in resource){
-    		if(has.call(resource,i)){
-    			target[i]=resource[i];
-    		}
-    	}
+    function mixin(target, resource) {
+        for (var i in resource) {
+            if (has(resource, i)) {
+                target[i] = resource[i];
+            }
+        }
+    }
+
+    function parent(prototype) { //父类的实例存放实例初始化和class初始化属性
+        for (var i in prototype) {
+            if (has(prototype,i)) {
+                this[i] = prototype[i];
+            }
+        }
+    };
+
+    function plain() {};
+
+    function createClass(prototype, __initIns, __initClass) {
+
+        __initIns = __initIns || plain;
+        __initClass = __initClass || plain;
+        var parentProto = {
+            __initIns__: __initIns,
+            __initClass__: __initClass
+        };
+        parent.prototype = parentProto;
+        var f = function() {
+            this.__initIns__.apply(this, arguments);
+            this.initialize && this.initialize.apply(this, arguments);
+        };
+
+        f.__initClass__ = __initClass;
+        __initClass(f);
+        f.__initIns__ = __initIns;
+        f.extend = extend;
+
+        var fProto = new parent(prototype);
+        fProto.constructor = f;
+        f.prototype = fProto;
+        return f;
+    };
+
+    function inherit(seed, another, initialize) {
+        var child = function() {
+            another.apply(this, arguments);
+            initialize && initialize.apply(this, arguments);
+        };
+        plain.prototype = another.prototype;
+
+        var proto = new plain;
+        plain.prototype = proto;
+        proto = new plain;
+        child.prototype = proto;
+        mixin(proto, seed);
+        return child;
+    }
+
+    function mixin(des, src) {
+        for (var i in src) {
+            if (has(src,i)) {
+                des[i] = src[i];
+            }
+        }
+    }
+
+    function extend(seed, initialize) {
+        return inherit(seed, this, initialize);
     }
     //member table
     var __map__ = {
-        has:has,
-        curry1:curry1,
-        partial1:partial1,
+        has: has,
+        curry1: curry1,
+        partial1: partial1,
         map: map,
         reduce: reduce,
-        reduceRight:reduceRight,
+        reduceRight: reduceRight,
         each: each,
-        filter:filter,
-        every:every,
-        some:some,
+        filter: filter,
+        every: every,
+        some: some,
         isFunction: isFunction,
         isArray: isArray,
         isString: isString,
@@ -339,36 +463,39 @@
         toArray: toArray,
         existy: existy,
         truthy: truthy,
-        falsey:falsey,
-        nothingify:nothingify,
+        falsey: falsey,
+        nothingify: nothingify,
         not: not,
         fail: fail,
         warn: warn,
         note: note,
         aliasFor: aliasFor,
-        extend:extend
+        mixin: mixin,
+        createClass:createClass,
+        inherit:inherit,
+        Promise:Promise
     };
 
     //namespace and constuctor
-    var f=function(){};
+    var f = function() {};
 
     //member alias
-    var aliasFor__map__=__map__.aliasFor(__map__);
+    var aliasFor__map__ = __map__.aliasFor(__map__);
 
 
     aliasFor__map__.alias('reduce')
-    .is('reduceLeft')
-    .and('fold')
-    .are('foldLeft');
+        .is('reduceLeft')
+        .and('fold')
+        .are('foldLeft');
 
     aliasFor__map__.alias('each')
-    .is('forEach');
+        .is('forEach');
 
     aliasFor__map__.alias('reduceRight')
-    .is('foldRight');
+        .is('foldRight');
 
-    extend(f,__map__);
-    
+    mixin(f, __map__);
+
     return f;
 }, this);
 
