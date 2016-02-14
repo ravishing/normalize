@@ -1,12 +1,28 @@
-;
-void
-function(factory, root) {
-    // console.log(root)
-    root._f = factory.call(root);
-}(function() {
-    'use strict'
+/**
+ * todo:防止数据突变
+ * todo:写一个不可变的数据结构来替换js原生的数据结构
+ * 加油啊，Red!
+ * thanks Michael Fogus!
+ * 除了函数式api外还加入了一些面向对象的工具和函数，只有一个目的：效率;
+ */
+;void function(name,factory, root) {
+    var hasDefine=typeof define==='function';
+    var hasExports=typeof module==='object'&&module!=null&&typeof module.exports==='object';
+    if(hasExports){
+        module.exports=factory();
+    }else if(hasDefine){
+        if(define.amd){
+            define('_f',[],factory);
+        }
+    }else{
+        root[name] = factory();
+    }
+}('_f',function() {
+    // 'use strict'
     //native code
-    var root = this;
+    var root = typeof self==='object'&&self.self===self&&self||
+               typeof global==='object' && global.global===global&&global||
+               this;//借鉴了underscore的获取根对象的技巧。
     var __Array = root.Array;
     var __Object = root.Object;
     var ObjProto = __Object.prototype;
@@ -270,10 +286,18 @@ function(factory, root) {
         }
     }
 
-    function invoker(key, method) {
+    function invoker(key, method) {//uncurrying ,but 添加了对数据类型的校验，而uncurrying奉行的是鸭子类型思想。
         return function(target) {
             if (existy(target) && isFunction(target[key]) && target[key] === method) return method.apply(target, rest(arguments));
             return;
+        }
+    }
+
+
+
+    function uncurrying(fn){
+        return function(host){
+            return fn.call(host,rest(arguments));
         }
     }
 
@@ -429,7 +453,8 @@ function(factory, root) {
         }
     }
     //member table
-    var __map__ = {//46
+    var __map__ = {//47
+        uncurrying:uncurrying,
         pipe:pipe,
         Chain:Chain,
         has: has,
