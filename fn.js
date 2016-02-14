@@ -122,12 +122,10 @@
         }
     }
 
-    function partial1() {
-        var fn = _.first(arguments);
+    function partial1(fn) {
         var args = _.rest(arguments);
         return function() {
-            var arg = cat(args, arguments);
-            return apply(fn,null, arg);
+                return apply(fn,null, cat(args, arguments));
         }
     }
 
