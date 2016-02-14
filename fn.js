@@ -25,6 +25,8 @@
                this;//借鉴了underscore的获取根对象的技巧。
     var __Array = root.Array;
     var __Object = root.Object;
+    var __Function = root.Function;
+    var FuncProto=__Function.prototype;
     var ObjProto = __Object.prototype;
     var ArrayProto = __Array.prototype;
     var slice = ArrayProto.slice;
@@ -38,6 +40,8 @@
     var __some = ArrayProto.some;
     var __every = ArrayProto.every;
     var __has = ObjProto.hasOwnProperty;
+    var __call = FuncProto.call;
+    var __aplly= FuncProto.apply;
 
     var _Promise=createClass({},function(async,defferd){
         defferd=defferd instanceof  Defferd?((defferd.promise=this),defferd):new Defferd(this);
@@ -87,7 +91,8 @@
     var some = dispatch(invoker('some', __some), _some);
     var every = dispatch(invoker('every', __every), _every);
     var Promise = dispatch(__Promise, _Promise);
-
+    var call=uncurrying(Function.prototype.call);
+    var apply=uncurrying(Function.prototype.apply);
     //two underscore means native code,one underscore means poly;
     function fail(thing) {throw new Error(thing);}
 
@@ -295,9 +300,14 @@
 
 
 
-    function uncurrying(fn){
+    // function uncurrying(method){
+    //     return function(){
+    //         return __call.apply(method,arguments);
+    //     }
+    // }
+    function uncurrying(method){
         return function(host){
-            return fn.call(host,rest(arguments));
+            return method.apply(host,rest(arguments))
         }
     }
 
@@ -453,7 +463,9 @@
         }
     }
     //member table
-    var __map__ = {//47
+    var __map__ = {//49
+        call:call,
+        apply:apply,
         uncurrying:uncurrying,
         pipe:pipe,
         Chain:Chain,
@@ -539,6 +551,12 @@ var b=_f.pipe(function(a){
 },function(a){
     return a+2
 });
+Function.prototype.uncurrying=function(){
+    var that=this;
+    return function(){
+        return Function.prototype.call.apply(that,arguments);
+    }
+}
 // var a=new _f.Chain([1,2,3]).invoke('push',4,5,6).invoke('map',alert)
 // f.map('fdsafsad', f.identity);
 // f.reduce('123456789', function(seed, v, k, l) {
