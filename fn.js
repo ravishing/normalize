@@ -1,6 +1,6 @@
 /**
- * _f.js
- * (c) 2015-2016 Red <wanghongxin@outlook.com>
+ * _y.js
+ * (c) 2015-2016 Red <wanghongxin@outlook.com><QQ:2262118088>
  * MIT
  * todo:防止数据突变
  * todo:写一个不可变的数据结构来替换js原生的数据结构
@@ -14,40 +14,45 @@
         module.exports=factory();
     }else if(hasDefine){
         if(define.amd){
-            define('_f',[],factory);
+            define('_y',[],factory);
         }
     }else{
         root[name] = factory();
     }
-}('_f',function() {
+}('_y',function() {
     // 'use strict'
     //native code
     var root = typeof self==='object'&&self.self===self&&self||
                typeof global==='object' && global.global===global&&global||
                this;//underscore do so;
-    var __Array = root.Array;
-    var __Object = root.Object;
-    var __Function = root.Function;
-    var FuncProto=__Function.prototype;
-    var ObjProto = __Object.prototype;
-    var ArrayProto = __Array.prototype;
-    var slice = ArrayProto.slice;
-    var toString = ObjProto.toString;
-    var __Promise = root.Promise;
-    var __map = ArrayProto.map;
-    var __reduce = ArrayProto.reduce;
-    var __reduceRight = ArrayProto.reduceRight;
-    var __forEach = ArrayProto.forEach;
-    var __filter = ArrayProto.filter;
-    var __some = ArrayProto.some;
-    var __every = ArrayProto.every;
-    var __has = ObjProto.hasOwnProperty;
-    var __call = FuncProto.call;
-    var __aplly= FuncProto.apply;
+    var _Array_ = root.Array;
+    var _Object_ = root.Object;
+    var _Function_ = root.Function;
+    var _FuncProto_=_Function_.prototype;
+    var _ObjProto_ = _Object_.prototype;
+    var _ArrayProto_ = _Array_.prototype;
+    var _slice_ = _ArrayProto_.slice;
+    var toString = _ObjProto_.toString;
+    var _Promise_ = root.Promise;
+    var _map_ = _ArrayProto_.map;
+    var _reduce_ = _ArrayProto_.reduce;
+    var _reduceRight_ = _ArrayProto_.reduceRight;
+    var _forEach_ = _ArrayProto_.forEach;
+    var _filter_ = _ArrayProto_.filter;
+    var _some = _ArrayProto_.some;
+    var _every = _ArrayProto_.every;
+    var _has_ = _ObjProto_.hasOwnProperty;
+    var _call_ = _FuncProto_.call;
+    var _aplly_= _FuncProto_.apply;
+    var _bind_= _FuncProto_.bind;
 
 
-    var call=uncurrying(__call);
-    var apply=uncurrying(__aplly);
+    var call=uncurrying(_call_);
+    var apply=uncurrying(_aplly_);
+    var bind=dispatch(invoker('bind',_bind_),_bind);
+    var slice=dispatch(invoker('slice',_slice_),always([]));
+
+    // function _slice(arrayLike){return existy(arrayLike)?apply(_slice_,arrayLike,rest(arguments)):[];}
 
     var _Promise=createClass({},function(async,defferd){
         defferd=defferd instanceof  Defferd?((defferd.promise=this),defferd):new Defferd(this);
@@ -89,14 +94,14 @@
     var isNumber = isType('Number');
 
     //closure and combinor
-    var map = dispatch(invoker('map', __map), _map);
-    var reduce = dispatch(invoker('reduce', __reduce), _reduce);
-    var reduceRight = dispatch(invoker('reduceRight', __reduceRight), _reduceRight);
+    var map = dispatch(invoker('map', _map_), _map);
+    var reduce = dispatch(invoker('reduce', _reduce_), _reduce);
+    var reduceRight = dispatch(invoker('reduceRight', _reduceRight_), _reduceRight);
     var each = dispatch(forEach, _forEach);
-    var filter = dispatch(invoker('filter', __filter), _filter);
-    var some = dispatch(invoker('some', __some), _some);
-    var every = dispatch(invoker('every', __every), _every);
-    var Promise = dispatch(__Promise, _Promise);
+    var filter = dispatch(invoker('filter', _filter_), _filter);
+    var some = dispatch(invoker('some', _some), _some);
+    var every = dispatch(invoker('every', _every), _every);
+    var Promise = dispatch(_Promise_, _Promise);
     //two underscore means native code,one underscore means poly;
     function fail(thing) {throw new Error(thing);}
 
@@ -104,13 +109,13 @@
 
     function note() {console.log(['NOTE:', thing].join(' '));}
 
-    function has(obj, key) {return call(__has,obj, key);}
+    function has(obj, key) {return call(_has_,obj, key);}
 
     function existy(x) {return x != null;}
 
     function truthy(x) {return existy(x) && x !== false;}
 
-    function toArray(x) {return existy(x) ? call(slice,x) : [];}
+    function toArray(x) {return existy(x) ? call(_slice_,x) : [];}
 
     function first(x) {return nth(x, 0);}
 
@@ -122,16 +127,14 @@
         }
     }
 
-    function partial1() {
-        var fn = _.first(arguments);
+    function partial1(fn) {
         var args = _.rest(arguments);
         return function() {
-            var arg = cat(args, arguments);
-            return apply(fn,null, arg);
+                return apply(fn,null, cat(args, arguments));
         }
     }
 
-    function rest(x) {return toArray(x).slice(1);}
+    function rest(x) {return call(_slice_,toArray(x),1);}
 
     function nth(x, key) {return isIndexed(x) ? x[key] : undefined;}
 
@@ -261,7 +264,7 @@
         return function() {
             return x
         }
-    };
+    }
 
     function identity(x) {return x;}
 
@@ -306,7 +309,7 @@
 
     function uncurrying(method){
         return function(){
-            return __call.apply(method,arguments);
+            return _call_.apply(method,arguments);
         }
     }
     // function uncurrying(method){//why maxium call size?
@@ -349,7 +352,7 @@
     function forEach() {
         var head = first(arguments);
         if (existy(head) && head.forEach && head.forEach === __each) {
-            apply(invoker('forEach', __forEach),null, arguments);
+            apply(invoker('forEach', _forEach_),null, arguments);
             return head;
         } else {
             return;
@@ -381,7 +384,7 @@
         }
     };
 
-    function plain() {};
+    function plain() {}
 
     function createClass(prototype, __initIns, __initClass) {
 
@@ -411,7 +414,7 @@
         fProto.constructor = f;
         f.prototype = fProto;
         return f;
-    };
+    }
 
     function inherit(seed, another, initialize) {
         var child = function() {
@@ -440,7 +443,7 @@
         invoke:function(){
             var args=toArray(arguments);
             this._chains.push(function(value){
-                return apply(value[args[0]],value,args.slice(1));
+                return apply(value[args[0]],value,slice(args,1));
             });
             return this;
         },
@@ -461,49 +464,24 @@
         var args=toArray(arguments);
         return function(){
             var seed=apply(first(args),null,toArray(arguments));
-            return reduce(args.slice(1),function(product,current){
+            return reduce(slice(args,1),function(product,current){
                 return call(current,null,product);
             },seed);
         }
     }
+
+    function partial(fn){
+        var boundArgs=slice(arguments,1);
+    }
+
+    function _bind(fn,context){
+        var boundArgs=slice(arguments,2);
+        return function(){
+            return apply(fn,context,cat(boundArgs,arguments));
+        };
+    }
     //member table
-    var __map__ = {//49
-        call:call,
-        apply:apply,
-        uncurrying:uncurrying,
-        pipe:pipe,
-        Chain:Chain,
-        has: has,
-        curry1: curry1,
-        partial1: partial1,
-        map: map,
-        reduce: reduce,
-        reduceRight: reduceRight,
-        each: each,
-        filter: filter,
-        every: every,
-        some: some,
-        isFunction: isFunction,
-        isArray: isArray,
-        isString: isString,
-        isNumber: isNumber,
-        isIndexed: isIndexed,
-        cat: cat,
-        construct: construct,
-        validator: validator,
-        checkor: checkor,
-        invoker: invoker,
-        nth: nth,
-        first: first,
-        rest: rest,
-        second: second,
-        pluck: pluck,
-        dispatch: dispatch,
-        fnull: fnull,
-        when: when,
-        always: always,
-        identity: identity,
-        toArray: toArray,
+    var _hash = {//51
         existy: existy,
         truthy: truthy,
         falsey: falsey,
@@ -512,6 +490,45 @@
         fail: fail,
         warn: warn,
         note: note,
+        isFunction: isFunction,
+        isArray: isArray,
+        isString: isString,
+        isNumber: isNumber,
+        isIndexed: isIndexed,
+        has: has,
+        bind:bind,
+        call:call,
+        apply:apply,
+        uncurrying:uncurrying,
+        curry1: curry1,
+        partial1: partial1,
+        partial:partial,
+        toArray: toArray,
+        slice:slice,
+        map: map,
+        reduce: reduce,
+        reduceRight: reduceRight,
+        each: each,
+        filter: filter,
+        every: every,
+        some: some,
+        cat: cat,
+        construct: construct,
+        nth: nth,
+        first: first,
+        rest: rest,
+        second: second,
+        pipe:pipe,
+        Chain:Chain,
+        validator: validator,
+        dispatch: dispatch,
+        checkor: checkor,
+        invoker: invoker,
+        pluck: pluck,
+        fnull: fnull,
+        when: when,
+        always: always,
+        identity: identity,
         aliasFor: aliasFor,
         mixin: mixin,
         createClass:createClass,
@@ -520,26 +537,26 @@
     };
 
     //namespace and constuctor
-    var f = function() {};
+    function y() {};
 
     //member alias
-    var aliasFor__map__ = __map__.aliasFor(__map__);
+    var aliasFor_hash = _hash.aliasFor(_hash);
 
 
-    aliasFor__map__.alias('reduce')
+    aliasFor_hash.alias('reduce')
                    .is('reduceLeft')
                    .and('fold')
                    .are('foldLeft');
 
-    aliasFor__map__.alias('each')
+    aliasFor_hash.alias('each')
                    .is('forEach');
 
-    aliasFor__map__.alias('reduceRight')
+    aliasFor_hash.alias('reduceRight')
                    .is('foldRight');
 
-    mixin(f, __map__);
+    mixin(y, _hash);
 
-    return f;
+    return y;
 }, this);
 
 
@@ -547,21 +564,28 @@
 /**
  *test
  */
-var a=_f.Chain([1,2,3]).invoke('concat',4,5,6).invoke('map',function(value){
-    return value+1;
-}).value();
-var b=_f.pipe(function(a){
-    return a+1
-},function(a){
-    return a+2
-});
+var query=_y.bind(document.getElementById,document,'js');
+query();
+// var a=_y.Chain([1,2,3]).invoke('concat',4,5,6).invoke('map',function(value){
+//     return value+1;
+// }).value();
+// var b=_y.pipe(function(a){
+//     return a+1
+// },function(a){
+//     return a+2
+// });
+// var ab=function(a,b,c){
+
+// }
+// var cd=ab;
+// console.log(ab.length);
 // Function.prototype.uncurrying=function(){
 //     var that=this;
 //     return function(){
 //         return Function.prototype.call.apply(that,arguments);
 //     }
 // }
-// var a=new _f.Chain([1,2,3]).invoke('push',4,5,6).invoke('map',alert)
+// var a=new _y.Chain([1,2,3]).invoke('push',4,5,6).invoke('map',alert)
 // f.map('fdsafsad', f.identity);
 // f.reduce('123456789', function(seed, v, k, l) {
 //     seed = seed + v;
