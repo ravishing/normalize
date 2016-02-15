@@ -25,32 +25,45 @@
     var root = typeof self==='object'&&self.self===self&&self||
                typeof global==='object' && global.global===global&&global||
                this;//underscore do so;
-    var _Array_ = root.Array;
-    var _Object_ = root.Object;
-    var _Function_ = root.Function;
-    var _FuncProto_=_Function_.prototype;
-    var _ObjProto_ = _Object_.prototype;
-    var _ArrayProto_ = _Array_.prototype;
-    var _slice_ = _ArrayProto_.slice;
-    var toString = _ObjProto_.toString;
+    var Array = root.Array;
+    var Object = root.Object;
+    var Function = root.Function;
+    var FuncProto=Function.prototype;
+    var ObjProto = Object.prototype;
+    var ArrayProto = Array.prototype;
+    var _push_=ArrayProto.push;
+    var _shift_=ArrayProto.shift;
+    var _unshift_=ArrayProto.unshift;
+    var _splice_=ArrayProto.splice;
+    var _pop_=ArrayProto.pop;
+    var _slice_ = ArrayProto.slice;
+    var _toString_ = ObjProto.toString;
     var _Promise_ = root.Promise;
-    var _map_ = _ArrayProto_.map;
-    var _reduce_ = _ArrayProto_.reduce;
-    var _reduceRight_ = _ArrayProto_.reduceRight;
-    var _forEach_ = _ArrayProto_.forEach;
-    var _filter_ = _ArrayProto_.filter;
-    var _some = _ArrayProto_.some;
-    var _every = _ArrayProto_.every;
-    var _has_ = _ObjProto_.hasOwnProperty;
-    var _call_ = _FuncProto_.call;
-    var _aplly_= _FuncProto_.apply;
-    var _bind_= _FuncProto_.bind;
+    var _map_ = ArrayProto.map;
+    var _reduce_ = ArrayProto.reduce;
+    var _reduceRight_ = ArrayProto.reduceRight;
+    var _forEach_ = ArrayProto.forEach;
+    var _filter_ = ArrayProto.filter;
+    var _some = ArrayProto.some;
+    var _every = ArrayProto.every;
+    var _has_ = ObjProto.hasOwnProperty;
+    var _call_ = FuncProto.call;
+    var _aplly_= FuncProto.apply;
+    var _bind_= FuncProto.bind;
 
-
+    //uncurrying
+    //
+    // var toArray=curry2(slice)(0);
     var call=uncurrying(_call_);
     var apply=uncurrying(_aplly_);
-    var bind=dispatch(invoker('bind',_bind_),_bind);
-    var slice=dispatch(invoker('slice',_slice_),always([]));
+    var bind=dispatch(invoker('bind',_bind_),_bind);//兼容es<5
+    var slice=dispatch(invoker('slice',_slice_),always([]));//兼容undefined and null
+    var toString=uncurrying(_toString_);//调用者保证前置条件，函数本身没有这个职责;
+    var push=uncurrying(_push_);
+    var shift=uncurrying(_shift_);
+    var splice=uncurrying(_splice_);
+    var unshift=uncurrying(_unshift_);
+    var pop=uncurrying(_pop_);
 
     // function _slice(arrayLike){return existy(arrayLike)?apply(_slice_,arrayLike,rest(arguments)):[];}
 
@@ -122,8 +135,16 @@
     function second(x) {return nth(x, 1);}
 
     function curry1(fn) {
-        return function(arg) {
-            return call(fn,null, arg);
+        return function(arg1) {
+            return call(fn,null,arg1);
+        }
+    }
+
+    function curry2(fn){
+        return function(arg2){
+            return function(arg1){
+                return call(fn,null,arg1,arg2);
+            }
         }
     }
 
@@ -236,7 +257,7 @@
 
     function isType(x) {
         return function(y) {
-            return call(toString,y) == '[object ' + x + ']';
+            return toString(y) == '[object ' + x + ']';
         }
     }
 
@@ -470,8 +491,37 @@
         }
     }
 
-    function partial(fn){
-        var boundArgs=slice(arguments,1);
+    function partial(fn,length,args,holes){
+        // var boundArgs=slice(arguments,1);
+        length=length||fn.length;
+        args=args||[];
+        holes=holes||[];
+        return function(){
+            var _args=toArray(arguments);
+            var _holes=toArray(holes);
+            var argStart=_args.length;
+            var holeStart=_holes.length;
+            var arg,i;
+            for(i=0;i<arguments.length;++i){
+                arg=arguments[i];
+                if(arg===y&&holeStart){
+                    holeStart--;
+                    push(_holes,shift(_holes));
+                }else if(arg===y){
+                    push(_holes,argStart+1);
+                }else if(holeStart){
+                    holeStart--;
+                    splice(_args,shift(_holes),0,arg);
+                }else{
+                    push(_args,arg);
+                }
+            }
+            if(_args.length<length){
+                return call(partial,null,fn,length,_args,_holes);
+            }else{
+                return apply(fn,null,_args);
+            }
+        };  
     }
 
     function _bind(fn,context){
@@ -481,7 +531,7 @@
         };
     }
     //member table
-    var _hash = {//51
+    var _hash = {//56
         existy: existy,
         truthy: truthy,
         falsey: falsey,
@@ -501,10 +551,16 @@
         apply:apply,
         uncurrying:uncurrying,
         curry1: curry1,
+        curry2:curry2,
         partial1: partial1,
         partial:partial,
         toArray: toArray,
         slice:slice,
+        shift:shift,
+        splice:splice,
+        pop:pop,
+        push:push,
+        unshift:unshift,
         map: map,
         reduce: reduce,
         reduceRight: reduceRight,
