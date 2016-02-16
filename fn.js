@@ -491,32 +491,34 @@
         }
     }
 
-    function partial(fn,length,args,holes,filled){
+    function partial(fn,length,args,holes){
         // var boundArgs=slice(arguments,1);
         length=length||fn.length;
         args=args||[];
         holes=holes||[];
-        filled=filled||[];
         return function(){
-            _args=toArray(arguments);
-            filled=cat(filled,_args);
-            var holeStart=filled.length;
+            var _args=toArray(args);
+            var _holes=toArray(holes);
+            var holeStart=_holes.length;
+            var argStart=_args.length;
             var arg;
-            for(var i=0,l=_args.length;i<l;++i){
-                arg=_args[i]
-                if(arg!==y){
-                    push(args,arg);
-                }
-                else{
-                    push(holes,holeStart++);
+            for(var i=0,l=arguments.length;i<l;++i){
+                arg=arguments[i];
+                if(arg===y&&holeStart){
+                    push(_holes,shift(_holes));
+                }else if(arg===y){
+                    push(holes,holeStart+i);
+                }else if(holeStart){
+                    holeStart--;
+                    splice(_args,shift(_holes),0,arg);
+                }else{
+                    push(_args,arg);
                 }
             }
-
-            var argsLength=args.length;
-            if(argsLength<length){
-                call(partial,null,fn,length,args,holes,filled);
+            if(_args.length<length){
+                return call(partial,null,fn,length,_args,_holes);
             }else{
-                apply(fn,null,args);
+                return apply(fn,null,_args);
             }
         };  
     }
