@@ -491,37 +491,32 @@
         }
     }
 
-    function partial(fn,length,args,holes){
+    function partial(fn,length,args,holes,filled){
         // var boundArgs=slice(arguments,1);
         length=length||fn.length;
         args=args||[];
         holes=holes||[];
+        filled=filled||[];
         return function(){
-            var _args=toArray(args);
-            var _holes=toArray(holes);
-            var argStart=_args.length;
-            var holeStart=_holes.length;
-            var arg,i;
-            for(i=0;i<arguments.length;i++){
-                arg=arguments[i];
-                if(arg===y&&holeStart){//有holes
-                    holeStart--;
-                    push(_holes,shift(_holes));
-                }else if(arg===y){//没有holes
-                    push(_holes,argStart+1);//期望位置
-                }else if(holeStart){//没有hole
-                    holeStart--;
-                    splice(_args,shift(_holes),0,arg);
-                }else{//没有hole，holes
-                    push(_args,arg);
+            _args=toArray(arguments);
+            filled=cat(filled,_args);
+            var holeStart=filled.length;
+            var arg;
+            for(var i=0,l=_args.length;i<l;++i){
+                arg=_args[i]
+                if(arg!==y){
+                    push(args,arg);
                 }
-                console.log(holes)
+                else{
+                    push(holes,holeStart++);
+                }
             }
-            console.log(_args,holes);
-            if(_args.length<length){
-                return call(partial,this,fn,length,_args,_holes);
+
+            var argsLength=args.length;
+            if(argsLength<length){
+                call(partial,null,fn,length,args,holes,filled);
             }else{
-                return apply(fn,this,_args);
+                apply(fn,null,args);
             }
         };  
     }
