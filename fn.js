@@ -14,7 +14,7 @@
         module.exports=factory();
     }else if(hasDefine){
         if(define.amd){
-            define('_y',[],factory);
+            define(name,[],factory);
         }
     }else{
         root[name] = factory();
@@ -437,7 +437,7 @@
         return f;
     }
 
-    function inherit(seed, another, initialize) {
+    function extendClass(seed, another, initialize) {
         var child = function() {
             apply(another,this, arguments);
             initialize && apply(initialize,this, arguments);
@@ -479,7 +479,7 @@
         return this;
     });
 
-    function extend(seed, initialize) {return inherit(seed, this, initialize);}
+    function extend(seed, initialize) {return extendClass(seed, this, initialize);}
     
     function pipe(){
         var args=toArray(arguments);
@@ -497,18 +497,17 @@
         args=args||[];
         holes=holes||[];
         return function(){
-            var _args=toArray(arguments);
+            var _args=toArray(args);
             var _holes=toArray(holes);
-            var argStart=_args.length;
             var holeStart=_holes.length;
-            var arg,i;
-            for(i=0;i<arguments.length;++i){
+            var argStart=_args.length;
+            var arg;
+            for(var i=0,l=arguments.length;i<l;++i){
                 arg=arguments[i];
                 if(arg===y&&holeStart){
-                    holeStart--;
                     push(_holes,shift(_holes));
                 }else if(arg===y){
-                    push(_holes,argStart+1);
+                    push(holes,holeStart+i);
                 }else if(holeStart){
                     holeStart--;
                     splice(_args,shift(_holes),0,arg);
@@ -531,7 +530,7 @@
         };
     }
     //member table
-    var _hash = {//56
+    var _hash = {//58
         existy: existy,
         truthy: truthy,
         falsey: falsey,
@@ -588,29 +587,32 @@
         aliasFor: aliasFor,
         mixin: mixin,
         createClass:createClass,
-        inherit:inherit,
+        extendClass:extendClass,
         Promise:Promise
     };
 
     //namespace and constuctor
     function y() {};
 
+    mixin(y, _hash);
+
     //member alias
-    var aliasFor_hash = _hash.aliasFor(_hash);
+    var aliasFor_y = _hash.aliasFor(y);
 
 
-    aliasFor_hash.alias('reduce')
+    aliasFor_y.alias('reduce')
                    .is('reduceLeft')
                    .and('fold')
                    .are('foldLeft');
 
-    aliasFor_hash.alias('each')
+    aliasFor_y.alias('each')
                    .is('forEach');
 
-    aliasFor_hash.alias('reduceRight')
+    aliasFor_y.alias('reduceRight')
                    .is('foldRight');
 
-    mixin(y, _hash);
+    aliasFor_y.alias('createClass')
+                 .is('inherit');
 
     return y;
 }, this);
@@ -622,6 +624,9 @@
  */
 var query=_y.bind(document.getElementById,document,'js');
 query();
+var a=_y.partial(function(a,b,c,d,e){
+    return [a,b,c,d,e]
+});
 // var a=_y.Chain([1,2,3]).invoke('concat',4,5,6).invoke('map',function(value){
 //     return value+1;
 // }).value();
