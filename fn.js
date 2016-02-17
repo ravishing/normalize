@@ -14,7 +14,7 @@
         module.exports=factory();
     }else if(hasDefine){
         if(define.amd){
-            define('_y',[],factory);
+            define(name,[],factory);
         }
     }else{
         root[name] = factory();
