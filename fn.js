@@ -529,8 +529,32 @@
             return apply(fn,context,cat(boundArgs,arguments));
         };
     }
+
+    function lift(answerFn,stateFn){
+        return function(){
+            var args=toArray(arguments);
+            return function(state){
+                var answer=apply(answerFn,null,construct(state,args));
+                var state=stateFn?stateFn(state):answer;
+                return {answer:answer,state:state};
+            }
+        }
+    }
+
+    function actions(acts,done){
+        return function(seed){
+            var init={values:[],state:seed};
+            var lastResult=reduce(acts,function(product,act){
+                var result=act(product.state);
+                var values=cat(product.values,result.answer);
+                return {values:values,state:result.state};
+            },init);
+            var keep=filter(lastResult.values,existy);
+            return done(keep,lastResult.state);
+        }
+    }
     //member table
-    var _hash = {//58
+    var _hash = {//60
         existy: existy,
         truthy: truthy,
         falsey: falsey,
@@ -577,6 +601,8 @@
         Chain:Chain,
         validator: validator,
         dispatch: dispatch,
+        lift:lift,
+        actions:actions,
         checkor: checkor,
         invoker: invoker,
         pluck: pluck,
@@ -627,6 +653,23 @@ query();
 var a=_y.partial(function(a,b,c,d,e){
     return [a,b,c,d,e]
 });
+var a=_y.pipe(function(a){
+    return a+1
+},function(a){    return a+2
+});
+console.log(a(3));
+var add3=_y.lift(function(a){
+    return a+3;
+});
+var add4=_y.lift(function(a){
+    return a+4;
+});
+var add7=_y.actions([add3(),add4()],function(values,state){
+    console.log(values,state);
+    return state;
+});
+console.log(add7(3));
+
 // var a=_y.Chain([1,2,3]).invoke('concat',4,5,6).invoke('map',function(value){
 //     return value+1;
 // }).value();
