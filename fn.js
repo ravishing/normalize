@@ -538,16 +538,19 @@
         }
     }
 
-    function actions(acts,done){
-        return function(seed){
-            var init={values:[],state:seed};
-            var lastResult=reduce(acts,function(product,act){
-                var result=act(product.state);
-                var values=cat(product.values,result.answer);
-                return {values:values,state:result.state};
-            },init);
-            var keep=filter(lastResult.values,existy);
-            return done(keep,lastResult.state);
+    function actions(){
+        var acts=toArray(arguments);
+        return function(done){
+            return function(seed){
+                var init={values:[],state:seed};
+                var lastResult=reduce(acts,function(product,act){
+                    var result=act(product.state);
+                    var values=cat(product.values,result.answer);
+                    return {values:values,state:result.state};
+                },init);
+                var keep=filter(lastResult.values,existy);
+                return done(keep,lastResult.state);
+            }
         }
     }
     //member table
@@ -661,7 +664,7 @@ var add3=_y.lift(function(a){
 var add4=_y.lift(function(a){
     return a+4;
 });
-var add7=_y.actions([add3,add4],function(values,state){
+var add7=_y.actions(add3,add4)(function(values,state){
     console.log(values,state);
     return state;
 });
