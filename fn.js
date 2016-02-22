@@ -531,13 +531,10 @@
     }
 
     function lift(answerFn,stateFn){
-        return function(){
-            var args=toArray(arguments);
-            return function(state){
-                var answer=apply(answerFn,null,construct(state,args));
-                var state=stateFn?stateFn(state):answer;
-                return {answer:answer,state:state};
-            }
+        return function(state){
+            var answer=answerFn(state);
+            var state=stateFn?stateFn(state):answer;
+            return {answer:answer,state:state};
         }
     }
 
@@ -664,7 +661,7 @@ var add3=_y.lift(function(a){
 var add4=_y.lift(function(a){
     return a+4;
 });
-var add7=_y.actions([add3(),add4()],function(values,state){
+var add7=_y.actions([add3,add4],function(values,state){
     console.log(values,state);
     return state;
 });
