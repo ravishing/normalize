@@ -1,11 +1,12 @@
 /**
- * _y.js
+ * _y.js：github.com/triumphalism/fn.git
  * (c) 2015-2016 Red <wanghongxin@outlook.com><QQ:2262118088>
  * MIT
  * todo:防止数据突变
  * todo:写一个不可变的数据结构来替换js原生的数据结构
  * 加油啊，Red!
  * thanks Michael Fogus!
+ * done:惰性链/管道/类/继承/掺和/类型判断/柯里化/反柯里化
  */
 ;void function(name,factory, root) {
     var hasDefine=typeof define==='function';
@@ -474,8 +475,9 @@
             },this._value);
         }
     },function(value){
-        this._value=value;
-        this._chains=[];
+        var isChain=value instanceof Chain;
+        this._value=isChain?value._value:value;
+        this._chains=isChain?value._chains:[];
         return this;
     });
 
@@ -657,7 +659,6 @@ var a=_y.pipe(function(a){
     return a+1
 },function(a){    return a+2
 });
-console.log(a(3));
 var add3=_y.lift(function(a){
     return a+3;
 });
@@ -665,11 +666,13 @@ var add4=_y.lift(function(a){
     return a+4;
 });
 var add7=_y.actions(add3,add4)(function(values,state){
-    console.log(values,state);
     return state;
 });
-console.log(add7(3));
-
+var a=_y.Chain([1,2]);
+a.invoke('concat',4,5,6).invoke('map',function(a){
+    return a*3;
+})
+console.log(a.invoke('concat',1).value())
 // var a=_y.Chain([1,2,3]).invoke('concat',4,5,6).invoke('map',function(value){
 //     return value+1;
 // }).value();
