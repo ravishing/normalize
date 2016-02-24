@@ -390,13 +390,13 @@
         return array;
     }
 
-    function mixin(target, resource) {
-        for (var i in resource) {
-            if (has(resource, i)) {
-                target[i] = resource[i];
-            }
-        }
-    }
+    // function mixin(target, resource) {
+    //     for (var i in resource) {
+    //         if (has(resource, i)) {
+    //             target[i] = resource[i];
+    //         }
+    //     }
+    // }
 
     function parent(prototype) { //父类的实例存放实例初始化和class初始化属性
         for (var i in prototype) {
@@ -456,9 +456,9 @@
     function mixin(des, src) {
         var args=toArray(arguments);
         var l=args.length;
-        while(l--){
-            var now=args[l];
-            var next=args[l++];
+        while(--l){
+            var next=args[l];
+            var now=args[l-1];
             for (var i in next) {
                 if (has(next,i)) {
                     now[i] = next[i];
