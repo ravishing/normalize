@@ -454,9 +454,15 @@
     }
 
     function mixin(des, src) {
-        for (var i in src) {
-            if (has(src,i)) {
-                des[i] = src[i];
+        var args=toArray(arguments);
+        var l=args.length;
+        while(l--){
+            var now=args[l];
+            var next=args[l++];
+            for (var i in next) {
+                if (has(next,i)) {
+                    now[i] = next[i];
+                }
             }
         }
     }
