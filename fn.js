@@ -455,18 +455,22 @@
 
     function mixin(des, src) {
         var args=toArray(arguments);
+        var i=0;
         var l=args.length;
-        while(--l){
-            var next=args[l];
-            var now=args[l-1];
-            for (var i in next) {
-                if (has(next,i)) {
-                    now[i] = next[i];
+        while(++i<l){
+            var next=args[i];
+            for (var j in next) {
+                if (has(next,j)) {
+                    des[j] = next[j];
                 }
             }
         }
+        return des;
     }
 
+    function merge(des,src){
+        return apply(mixin,null,construct({},toArray(arguments)));
+    }
     var Chain=createClass({
         invoke:function(){
             var args=toArray(arguments);
@@ -562,7 +566,7 @@
         }
     }
     //member table
-    var _hash = {//60
+    var _hash = {//61
         existy: existy,
         truthy: truthy,
         falsey: falsey,
@@ -620,6 +624,7 @@
         identity: identity,
         aliasFor: aliasFor,
         mixin: mixin,
+        merge:merge,
         createClass:createClass,
         extendClass:extendClass,
         Promise:Promise
