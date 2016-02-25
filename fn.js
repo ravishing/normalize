@@ -135,6 +135,18 @@
 
     function second(x) {return nth(x, 1);}
 
+    function iterateUntil(fn,check,seed){
+        var value=fn(seed);
+        var ret=[];
+        ret.push(value);
+
+        while(check(value)){
+            value=fn(value);
+            ret.push(value);
+        }
+        return ret;
+    }
+
     function curry1(fn) {
         return function(arg1) {
             return call(fn,null,arg1);
@@ -474,20 +486,20 @@
     var Chain=createClass({
         invoke:function(){
             var args=toArray(arguments);
-            this._chains.push(function(value){
+            this._calls.push(function(value){
                 return apply(value[args[0]],value,slice(args,1));
             });
             return this;
         },
         value:function(){
-            return reduce(this._chains,function(product,current){
+            return reduce(this._calls,function(product,current){
                 return current(product);
             },this._value);
         }
     },function(value){
         var isChain=value instanceof Chain;
         this._value=isChain?value._value:value;
-        this._chains=isChain?value._chains:[];
+        this._calls=isChain?value._calls:[];
         return this;
     });
 
@@ -566,7 +578,7 @@
         }
     }
     //member table
-    var _hash = {//61
+    var _hash = {//62
         existy: existy,
         truthy: truthy,
         falsey: falsey,
@@ -589,6 +601,7 @@
         curry2:curry2,
         partial1: partial1,
         partial:partial,
+        iterateUntil:iterateUntil,
         toArray: toArray,
         slice:slice,
         shift:shift,
@@ -652,6 +665,8 @@
 
     aliasFor_y.alias('createClass')
                  .is('inherit');
+    aliasFor_y.alias('always')
+                   .is('k');
 
     return y;
 }, this);
