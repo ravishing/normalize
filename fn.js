@@ -54,7 +54,7 @@
 
     //uncurrying
     //
-    // var toArray=curry2(slice)(0);
+    // var toArray=curry2r(slice)(0);
     var call=uncurrying(_call_);
     var apply=uncurrying(_aplly_);
     var bind=dispatch(invoker('bind',_bind_),_bind);//兼容es<5
@@ -153,9 +153,17 @@
         }
     }
 
-    function curry2(fn){
+    function curry2r(fn){
         return function(arg2){
             return function(arg1){
+                return call(fn,null,arg1,arg2);
+            }
+        }
+    }
+
+    function curry2(fn){
+        return function(arg1){
+            return function(arg2){
                 return call(fn,null,arg1,arg2);
             }
         }
@@ -578,7 +586,7 @@
         }
     }
     //member table
-    var _hash = {//62
+    var _hash = {//63
         existy: existy,
         truthy: truthy,
         falsey: falsey,
@@ -599,6 +607,7 @@
         uncurrying:uncurrying,
         curry1: curry1,
         curry2:curry2,
+        curry2r:curry2r,
         partial1: partial1,
         partial:partial,
         iterateUntil:iterateUntil,
@@ -667,6 +676,11 @@
                  .is('inherit');
     aliasFor_y.alias('always')
                    .is('k');
+    aliasFor_y.alias('curry1')
+                    .is('curry1l')
+                    .and('curry1r');
+    aliasFor_y.alias('curry2')
+                    .is('curry2l');
 
     return y;
 }, this);
