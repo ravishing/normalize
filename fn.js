@@ -169,6 +169,26 @@
         }
     }
 
+    function curry3(fn){
+        return function(arg1){
+            return function(arg2){
+                return function(arg3){
+                    return call(fn,null,arg1,arg2,arg3);
+                }
+            }
+        }
+    }
+
+    function curry3r(fn){
+        return function(arg3){
+            return function(arg2){
+                return function(arg1){
+                    return call(fn,null,arg1,arg2,arg3);
+                }
+            }
+        }
+    }
+
     function partial1(fn) {
         var args = _.rest(arguments);
         return function() {
@@ -386,6 +406,7 @@
                 obj[newname] = obj[oldname];
                 return fn;
             }
+            fn.alias=alias;
             return fn.is = fn.are = fn.and = fn;
         };
         return alias.alias = alias;
@@ -586,7 +607,7 @@
         }
     }
     //member table
-    var _hash = {//63
+    var _hash = {//65
         existy: existy,
         truthy: truthy,
         falsey: falsey,
@@ -607,7 +628,9 @@
         uncurrying:uncurrying,
         curry1: curry1,
         curry2:curry2,
+        curry3:curry3,
         curry2r:curry2r,
+        curry3r:curry3r,
         partial1: partial1,
         partial:partial,
         iterateUntil:iterateUntil,
@@ -658,29 +681,26 @@
     mixin(y, _hash);
 
     //member alias
-    var aliasFor_y = _hash.aliasFor(y);
-
-
-    aliasFor_y.alias('reduce')
-                   .is('reduceLeft')
-                   .and('fold')
-                   .are('foldLeft');
-
-    aliasFor_y.alias('each')
-                   .is('forEach');
-
-    aliasFor_y.alias('reduceRight')
-                   .is('foldRight');
-
-    aliasFor_y.alias('createClass')
-                 .is('inherit');
-    aliasFor_y.alias('always')
-                   .is('k');
-    aliasFor_y.alias('curry1')
-                    .is('curry1l')
-                    .and('curry1r');
-    aliasFor_y.alias('curry2')
-                    .is('curry2l');
+    aliasFor(y)
+        .alias('reduce')
+            .is('reduceLeft')
+            .and('fold')
+            .are('foldLeft')
+        .alias('each')
+            .is('forEach')
+        .alias('reduceRight')
+            .is('foldRight')
+        .alias('createClass')
+            .is('inherit')
+        .alias('always')
+            .is('k')
+        .alias('curry1')
+            .is('curry1l')
+            .and('curry1r')
+        .alias('curry2')
+            .is('curry2l')
+        .alias('curry3')
+            .is('curry3l');
 
     return y;
 }, this);
