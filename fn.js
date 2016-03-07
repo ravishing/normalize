@@ -148,9 +148,9 @@
     }
     
     function best(fn,list){
-	return reduce(list,function(x,y){
-	  return fn(x,y)?x:y;
-	});
+	   return reduce(list,function(x,y){
+	       return fn(x,y)?x:y;
+	   });
     }
 
     function curry1(fn) {
