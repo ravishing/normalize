@@ -146,6 +146,12 @@
         }
         return ret;
     }
+    
+    function best(fn,list){
+	return reduce(list,function(x,y){
+	  return fn(x,y)?x:y;
+	});
+    }
 
     function curry1(fn) {
         return function(arg1) {
@@ -389,7 +395,7 @@
         return wapper;
     }
 
-    function checkor(validators) {
+    function checker(validators) {
         var validators = toArray(arguments);
         return function() {
             var args = toArray(arguments);
@@ -607,7 +613,7 @@
         }
     }
     //member table
-    var _hash = {//65
+    var _hash = {//66
         existy: existy,
         truthy: truthy,
         falsey: falsey,
@@ -660,7 +666,7 @@
         dispatch: dispatch,
         lift:lift,
         actions:actions,
-        checkor: checkor,
+        checker: checker,
         invoker: invoker,
         pluck: pluck,
         fnull: fnull,
@@ -770,5 +776,5 @@ console.log(a.invoke('concat',1).value())
 //     if (x.message == 'hi') return true;
 //     else return false;
 // }, '不能为hi', false);
-// var check1 = f.checkor(validate1, validate2);
+// var check1 = f.checker(validate1, validate2);
 // check1(rule);
