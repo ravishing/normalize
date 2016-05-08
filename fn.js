@@ -630,14 +630,6 @@
     function isXX(array){
         return map(array,function(x,i,vector){
             var type;
-            switch(isType(x)){
-                case 'Number':
-                    type='n';
-                    break;
-                case 'Array':
-                    type=isType(x[0])==='Array'?'m':'v';
-                    break;
-            }
             if(isNumber(x)){
                 return 'n'
             }else if(isArray(x)){
@@ -651,7 +643,6 @@
             }else{
                 fail('只有标量才能计算哦');
             }
-            console.log(type,isType(x),x)
             return type;
 
         }).join('');
@@ -848,7 +839,7 @@ var a=_y.Chain([1,2]);
 a.invoke('concat',4,5,6).invoke('map',function(a){
     return a*3;
 })
-console.log(a.invoke('concat',1).value())
+// console.log(a.invoke('concat',1).value())
 // var a=_y.Chain([1,2,3]).invoke('concat',4,5,6).invoke('map',function(value){
 //     return value+1;
 // }).value();
