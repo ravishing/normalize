@@ -1,12 +1,14 @@
 /**
  * _y.js：github.com/triumphalism/fn.git
- * (c) 2015-2016 Red <wanghongxin@outlook.com><QQ:2262118088>
  * MIT
  * todo:防止数据突变
  * todo:写一个不可变的数据结构来替换js原生的数据结构
  * 加油啊，Red!
  * thanks Michael Fogus!
  * done:惰性链/管道/类/继承/掺和/类型判断/柯里化/反柯里化
+ * 用js描述线性运算和矩阵
+ * 
+ * 
  */
 ;void function(name,factory, root) {
     var hasDefine=typeof define==='function';
@@ -119,9 +121,9 @@
     //two underscore means native code,one underscore means poly;
     function fail(thing) {throw new Error(thing);}
 
-    function warn() {console.info(['WARNING:', thing].join(' '));}
+    function warn(thing) {console.info(['WARNING:', thing].join(' '));}
 
-    function note() {console.log(['NOTE:', thing].join(' '));}
+    function note(thing) {console.log(['NOTE:', thing].join(' '));}
 
     function has(obj, key) {return call(_has_,obj, key);}
 
@@ -612,8 +614,115 @@
             }
         }
     }
+
+    var XX={
+        'nn':nn,
+        'nv':nv,
+        'vv':vv,
+        'mm':mm,
+        'mv':mv,
+        'vm':vm,
+        'vn':vn,
+        'mn':mn,
+        'nm':nm
+    };
+
+    function isXX(array){
+        return map(array,function(x,i,vector){
+            var type;
+            switch(isType(x)){
+                case 'Number':
+                    type='n';
+                    break;
+                case 'Array':
+                    type=isType(x[0])==='Array'?'m':'v';
+                    break;
+            }
+            if(isNumber(x)){
+                return 'n'
+            }else if(isArray(x)){
+                if(isArray(x[0])){
+                    return 'm';
+                }else if(isNumber(x[0])){
+                    return 'v';
+                }else{
+                    fail('只有标量才能计算哦');
+                }
+            }else{
+                fail('只有标量才能计算哦');
+            }
+            console.log(type,isType(x),x)
+            return type;
+
+        }).join('');
+    }
+
+    function nn(n1,n2){
+        return n1*n2;
+    }
+
+    function nv(n,v){
+        return map(v,function(x,i,v){
+            return n*x;
+        });
+    }
+
+    function vn(v,n){
+        return nv(n,v);
+    }
+
+    function vm(v,m){
+        return mv(m,v);
+    }
+
+    function vv(v1,v2){
+        if(v1.length!==v2.length)fail('只有标量才能计算哦');
+        return reduce(v1,function(c,x,i,v){
+            return c+x*v2[i];
+        },0);
+    }
+
+    function mv(m,v){
+        return map(m,function(x,i,vector){
+            return vv(x,v);
+        });
+    }
+
+    function mm(m1,m2){
+        return T(map(T(m2),function(x,i,vector){
+            return mv(m1,x);
+        }));
+    }
+
+    function mn(m,n){
+        return map(m,function(x,i,vector){
+            return vn(x,n);
+        });
+    }
+
+    function nm(n,m){
+        return mn(m,n);
+    }
+
+    function T(m){
+        return map(m[0],function(x,i,vector){
+            return map(m,function(y,j,list){
+                return m[j][i];
+            });
+        });
+    }
+
+    function xx(x1,x2){
+        return XX[isXX([x1,x2])](x1,x2);
+    }
+
+    function xxx(x1,x2){
+        return reduce(slice(toArray(arguments),2),function(c,x,i,vector){
+            return xx(c,x);
+        },xx(x1,x2));
+    }
     //member table
-    var _hash = {//66
+    var _hash = {//67
         existy: existy,
         truthy: truthy,
         falsey: falsey,
@@ -678,7 +787,8 @@
         merge:merge,
         createClass:createClass,
         extendClass:extendClass,
-        Promise:Promise
+        Promise:Promise,
+        xxx:xxx
     };
 
     //namespace and constuctor
