@@ -839,11 +839,18 @@ function(name, factory, root) {
     }
 
     function xxx(type,x1, x2) {
-        return type==='f'?apply(compose,null,map(rest(toArray(arguments)),function(x,i,vector){
-                return isFunction(x)?x:fnx(x);
-            })):reduce(slice(toArray(arguments), 3), function(c, x, i, vector) {
-            return xx(type,c, x);
-        }, xx(type,x1, x2));
+        var args=rest(toArray(arguments));
+        var arg=first(args);
+        return type==='f'?
+            (isFunction(arg)?apply(pipe,null,map(args,function(x,i,vector){
+                    return isFunction(x)?x:fnx(x);
+                })):apply(pipe,null,map(slice(args,1),function(x,i,vector){
+                    return isFunction(x)?x:fnx(x);
+                }))(arg))
+            :
+            reduce(slice(toArray(arguments), 3), function(c, x, i, vector) {
+                return xx(type,c, x);
+            }, xx(type,x1, x2));
     }
 
     function fnx(x){
