@@ -7,7 +7,7 @@
  * thanks Michael Fogus!
  * done:惰性链/管道/类/继承/掺和/类型判断/柯里化/反柯里化
  * 用js描述线性运算和矩阵
- * 
+ * 将乘法扩展到函数的组合
  * 
  */
 ;
@@ -677,8 +677,39 @@ function(name, factory, root) {
             'nn':__nn,
             'vv':_vv,
             'mm':_mm
+        },
+        'f':{
+            'ff':ff,
+            'fx':fx,
+            'xf':xf,
+            'nn':fxx,
+            'vv':fxx,
+            'vn':fxx,
+            'nv':fxx,
+            'mm':fxx,
+            'nm':fxx,
+            'mn':fxx,
+            'mv':fxx,
+            'vm':fxx
         }
     };
+
+    function ff(f1,f2){
+        return pipe(f1,f2);
+    }
+
+    function fx(f,x){
+        return pipe(f,fnx(x));
+    }
+
+    function xf(x,f){
+        return pipe(fnx(x),f);
+    }
+
+    function fxx(x1,x2){
+        return pipe(fnx(x1),fnx(x2));
+    }
+
 
     function isXX(array) {
         return map(array, function(x, i, vector) {
@@ -693,8 +724,10 @@ function(name, factory, root) {
                 } else {
                     fail('只有标量才能计算哦');
                 }
+            } else if(isFunction(x)){
+                return 'f'
             } else {
-                fail('只有标量才能计算哦');
+                fail('只有标量和函数才能计算哦');
             }
             return type;
 
@@ -802,8 +835,14 @@ function(name, factory, root) {
             return xx(type,c, x);
         }, xx(type,x1, x2));
     }
+
+    function fnx(x){
+        return function(y){
+            return xxx('*',x,y);
+        }
+    }
     //member table
-    var _hash = { //67
+    var _hash = { //68
         existy: existy,
         truthy: truthy,
         falsey: falsey,
@@ -869,7 +908,8 @@ function(name, factory, root) {
         createClass: createClass,
         extendClass: extendClass,
         Promise: Promise,
-        xxx: xxx
+        xxx: xxx,
+        fnx:fnx
     };
 
     //namespace and constuctor
