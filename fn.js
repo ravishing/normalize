@@ -584,6 +584,10 @@ function(name, factory, root) {
         }
     }
 
+    function compose(){
+        return apply(pipe,null,toArray(arguments).reverse());
+    }
+
     function partial(fn, length, args, holes) {
         // var boundArgs=slice(arguments,1);
         length = length || fn.length;
@@ -699,19 +703,19 @@ function(name, factory, root) {
     };
 
     function ff(f1,f2){
-        return pipe(f1,f2);
+        return compose(f1,f2);
     }
 
     function fx(f,x){
-        return pipe(f,fnx(x));
+        return compose(f,fnx(x));
     }
 
     function xf(x,f){
-        return pipe(fnx(x),f);
+        return compose(fnx(x),f);
     }
 
     function fxx(x1,x2){
-        return pipe(fnx(x1),fnx(x2));
+        return compose(fnx(x1),fnx(x2));
     }
 
 
@@ -846,7 +850,7 @@ function(name, factory, root) {
         }
     }
     //member table
-    var _hash = { //68
+    var _hash = { //69
         existy: existy,
         truthy: truthy,
         falsey: falsey,
@@ -894,6 +898,7 @@ function(name, factory, root) {
         rest: rest,
         second: second,
         pipe: pipe,
+        compose:compose,
         Chain: Chain,
         validator: validator,
         dispatch: dispatch,
