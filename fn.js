@@ -839,7 +839,9 @@ function(name, factory, root) {
     }
 
     function xxx(type,x1, x2) {
-        return reduce(slice(toArray(arguments), 3), function(c, x, i, vector) {
+        return type==='f'?apply(compose,null,map(rest(toArray(arguments)),function(x,i,vector){
+                return isFunction(x)?x:fnx(x);
+            })):reduce(slice(toArray(arguments), 3), function(c, x, i, vector) {
             return xx(type,c, x);
         }, xx(type,x1, x2));
     }
