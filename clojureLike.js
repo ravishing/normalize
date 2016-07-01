@@ -40,6 +40,7 @@ function() {
     var _reduce = ArrayProto.reduce;
     var _map = ArrayProto.map;
     var _$1indexOf=StringProto.indexOf;
+    var _$2indexOf=ArrayProto.indexOf;
     var _max = Math.max;
 
 
@@ -107,7 +108,10 @@ function() {
         existy,
         alwayslist0
     );
-    var indexOf=dispatch(invoker('indexOf',_$1indexOf));
+    var indexOf=dispatch(invoker('indexOf',_$1indexOf),
+                         invoker('indexOf',_$2indexOf),
+                         fcheck($1indexOf,isArrayLike,-1)
+                            );
 
 
     // function uncurrying(method) {
@@ -314,7 +318,13 @@ function() {
         return apply(fn, null, args);
     }
 
-
+    function $1indexOf(arrayLike,x){
+        var ret=-1;
+        map(arrayLike,function(x,k){
+            if(x===arrayLike[k])ret=k;
+        });
+        return ret;
+    }
 
 
 
