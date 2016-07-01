@@ -3,9 +3,22 @@
  * [dom normorlize]
  */
 function() {
+    var root = window;
+    var setTimeout = root.setTimeout;
+    var Promise = root.Promise;
+    var slice = root.Array.prototype.slice;
+
+
+    var isArray = Type('Array');
+    var isObject = Type('Object');
+    var isFunction = Type('Function');
+    var isString = Type('String');
+
     $.prototype = [];
     $.prototype.constructor = $;
     $.uuid = uuid;
+    $.Promise = dispatch(Promise, $1Promise);
+    $.dispatch = dispatch;
     $.isInViewport = isInViewport;
     $.compile = compile;
     $.camelCase = camelCase;
@@ -57,7 +70,7 @@ function() {
             }
         };
     }();
-    $.oning=oning;
+    $.oning = oning;
     $.listenTo = listenTo;
     $.listenToOnce = listenToOnce;
     $.stopListening = stopListening;
@@ -202,13 +215,118 @@ function() {
     }();
     $.device = device;
 
-
-    var isArray = Type('Array');
-    var isObject = Type('Object');
-    var isFunction = Type('Function');
-    var isString = Type('String');
-
     function plain() {}
+
+    function dispatch() {
+        var args = arguments;
+        var x, r = null;
+        for (var i = 0, l = args.length; i < l; ++i) {
+            x = args[i];
+            r = isFunction(x) ? x : null;
+            if (r !== null) return r;
+        }
+        return plain;
+    }
+
+    function $1Promise(fn) {
+        var value;
+        var state = 'pending';
+        var thunks = [];
+        var errors = [];
+        var promise;
+        var flag = false;
+
+        function resolve(val) {
+            if (flag) return;
+            flag = true;
+            setTimeout(function() {
+                value = val;
+                state = 'fulfilled';
+                thunks = next(value, thunks);
+            }, 0);
+        }
+
+        function reject(err) {
+            if (flag) return;
+            flag = true;
+            setTimeout(function() {
+                value = err;
+                state = 'rejected';
+                errors = next(value, errors);
+            }, 0);
+        }
+
+        function next(value, list) {
+            if (list.length === 0) return [];
+            list[0](value);
+            next(value, slice.call(list, 1));
+        }
+
+        function dispatch(onFulfilled, onRejected) {
+            if (state === 'pending') {
+                thunks.push(onFulfilled);
+                errors.push(onRejected);
+            }
+            if (state === 'fulfilled' && f) {
+                setTimeout(function() {
+                    next(next_value, value, [onFulfilled], 0);
+                }, 0);
+            }
+            if (state === 'rejected' && r) {
+                setTimeout(function() {
+                    next(next_error, value, [onRejected], 1);
+                }, 0);
+            }
+        }
+
+        function wrapper(f, flag, resolve, reject) {
+            var k = flag ? function(x) { reject(x) } : function(x) { resolve(x) };
+            return isFunction(f) ? function(x) {
+                try {
+                    _call(f(x), resolve, reject);
+                } catch (error) {
+                    reject(error);
+                }
+            } : k;
+        }
+
+        function _call(value, resolve, reject) {
+            if (value && value.__type__ === plain) {
+                value.then(resolve, reject);
+            } else {
+                resolve(value);
+            }
+        }
+
+        try {
+            fn(resolve, reject);
+        } catch (error) {
+            reject(error);
+        }
+        return {
+            then: function(onFulfilled, onRejected) {
+                return new $1Promise(function(resolve, reject) {
+                    dispatch(wrapper(onFulfilled, 0, resolve, reject),
+                        wrapper(onRejected, 1, resolve, reject));
+                });
+            },
+            'catch': function(onRejected) {
+                return this.then(null, onRejected);
+            },
+            __type__: plain
+        };
+    }
+    $1Promise.resolve=function(x){
+        return new $1Promise(function(resolve,reject){
+            resolve(x);
+        });
+    };
+
+    $1Promise.reject=function(x){
+        return new $1Promise(function(resolve,reject){
+            reject(x);
+        });
+    };
 
     function createClass(className, proto) { //class system
         var $class = function() {
@@ -250,17 +368,17 @@ function() {
         reporter.on(event, callback, context);
     }
 
-    function style(opts){
-        $.map(this,function(x){
-            var style=x.style;
-            $.map(opts,function(x,k){
-                style[k]=x;
+    function style(opts) {
+        $.map(this, function(x) {
+            var style = x.style;
+            $.map(opts, function(x, k) {
+                style[k] = x;
             });
         });
         return this;
     }
 
-    function oning(reporter){
+    function oning(reporter) {
         if (!reporter) return;
         if (reporter.on !== $.Events.on) $.extend(reporter, $.Events);
         return reporter;
@@ -293,7 +411,7 @@ function() {
     $.fn.off = off;
     $.fn.attr = attr;
     $.fn.find = find;
-    $.fn.css=style;
+    $.fn.css = style;
 
     function attr(name, value) {
         if (name === 'html') {
@@ -579,7 +697,7 @@ function() {
         var arr = [],
             tmp,
             type = Object.prototype.toString.call(array);
-        if (!((typeof array.length === 'number')||isObject(array))) return;
+        if (!((typeof array.length === 'number') || isObject(array))) return;
         if (Object.prototype.toString.call(fn) === '[object Function]') {
             if (typeof array.length === 'number') {
                 for (var i = 0, l = array.length; i < l; ++i) {
@@ -589,7 +707,7 @@ function() {
                 }
             } else {
                 for (var i in array) {
-                    if (Object.prototype.hasOwnProperty.call(array,i) && ((tmp = fn.call(ctx, array[i], i, array)) != null)) {
+                    if (Object.prototype.hasOwnProperty.call(array, i) && ((tmp = fn.call(ctx, array[i], i, array)) != null)) {
                         arr.push(tmp);
                     }
                 }
