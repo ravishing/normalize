@@ -6,7 +6,9 @@ function() {
     var root = window;
     var setTimeout = root.setTimeout;
     var Promise = root.Promise;
-    var slice = root.Array.prototype.slice;
+    var Array = root.Array;
+    var slice = Array.prototype.slice;
+    var encodeURIComponent=root.encodeURIComponent;
 
 
     var isArray = Type('Array');
@@ -18,6 +20,7 @@ function() {
     $.prototype.constructor = $;
     $.uuid = uuid;
     $.Promise = dispatch(Promise, $1Promise);
+    $.encodeURIComponent=encodeURIComponent;
     $.dispatch = dispatch;
     $.isInViewport = isInViewport;
     $.compile = compile;
@@ -74,7 +77,7 @@ function() {
     $.listenTo = listenTo;
     $.listenToOnce = listenToOnce;
     $.stopListening = stopListening;
-    var device = function() {
+    var device = function() {//copy others
         var device,
             find,
             userAgent;
@@ -316,17 +319,38 @@ function() {
             __type__: plain
         };
     }
-    $1Promise.resolve=function(x){
-        return new $1Promise(function(resolve,reject){
+    $1Promise.resolve = function(x) {
+        return new $1Promise(function(resolve, reject) {
             resolve(x);
         });
     };
 
-    $1Promise.reject=function(x){
-        return new $1Promise(function(resolve,reject){
+    $1Promise.reject = function(x) {
+        return new $1Promise(function(resolve, reject) {
             reject(x);
         });
     };
+
+    $1Promise.all = function(args) {
+        return new $1Promise(function(resolve, reject) {
+            for (var i = 0, l = args.length, all = new Array(l),allResults=[]; i < l; ++i) {
+                !function(i) {
+                    var tmp=args[i].__type__===plain?args[i]:$1Promise.resolve(args[i]);
+                    tmp.then(function(value) {
+                        all[i]=true;
+                        allResults[i]=value;
+                        var flag=true;
+                        for(var j=0,l=args.length;i<l;++i){
+                            if(!all[i])flag=false;
+                        }
+                        if(flag)resolve(allResults);
+                    }, function(error) {
+                        reject(error);
+                    });
+                }(i);
+            }
+        });
+    }
 
     function createClass(className, proto) { //class system
         var $class = function() {
@@ -550,7 +574,7 @@ function() {
         return Math.min.apply(Math, array);
     }
 
-    function compile(str, data) { //compile tmp to function that can output html by data
+    function compile(str, data) { //copy other's,compile tmp to function that can output html by data
         var fn =
             new Function("obj",
                 "var p=[],print=function(){p.push.apply(p,arguments);};" +
@@ -580,7 +604,7 @@ function() {
     function jsonp(url, data, conf, cb, cache) {
         var conf = conf || [];
         var key = conf[0] || 'cb';
-        var value = (conf[1] || 'defaults') + (cache ? '' : (Math.random() + '').replace('.', ''));
+        var value = (conf[1] || 'defaults') + (false ? '' : (Math.random() + '').replace('.', ''));
         data[key] = value;
 
         var arr = [];
