@@ -1,748 +1,445 @@
 /**
  * author:wanghongxin492@emao.com
- * [dom normorlize]
+ * [data normorlize]
  */
 function() {
-    var root = window;
-    var setTimeout = root.setTimeout;
-    var Promise = root.Promise;
+    var root = typeof self === 'object' && self.self === self && self ||
+        typeof global === 'object' && global.global === global && global ||
+        this;
+
+    /**
+     * [native Class]
+     */
     var Array = root.Array;
-    var slice = Array.prototype.slice;
-    var encodeURIComponent=root.encodeURIComponent;
+    var Object = root.Object;
+    var Function = root.Function;
+    var String=root.String;
+    var Math = root.Math;
+
+    /**
+     * [native class's prototype]
+     * @type {[Object]}
+     */
+    var ArrayProto = Array.prototype;
+    var ObjectProto = Object.prototype;
+    var FunctionProto = Function.prototype;
+    var StringProto=String.prototype;
+
+    /**
+     * [native code]
+     * @type {[function]}
+     */
+    var _apply = FunctionProto.apply;
+    var _call = FunctionProto.call;
+    var _has = ObjectProto.hasOwnProperty;
+    var _toString = ObjectProto.toString;
+    var _keys = ObjectProto.keys;
+    var _$1slice = ArrayProto.slice;
+    var _$2slice = StringProto.slice;
+    var _shift = ArrayProto.shift;
+    var _concat = ArrayProto.concat;
+    var _reduce = ArrayProto.reduce;
+    var _map = ArrayProto.map;
+    var _$1indexOf=StringProto.indexOf;
+    var _$2indexOf=ArrayProto.indexOf;
+    var _max = Math.max;
 
 
-    var isArray = Type('Array');
-    var isObject = Type('Object');
-    var isFunction = Type('Function');
-    var isString = Type('String');
 
-    $.prototype = [];
-    $.prototype.constructor = $;
-    $.uuid = uuid;
-    $.Promise = dispatch(Promise, $1Promise);
-    $.encodeURIComponent=encodeURIComponent;
-    $.dispatch = dispatch;
-    $.isInViewport = isInViewport;
-    $.compile = compile;
-    $.camelCase = camelCase;
-    $.getCookie = getCookie;
-    $.setCookie = setCookie;
-    $.loadImg = loadImg;
-    $.jsonp = jsonp;
-    $.map = map;
-    $.extend = extend;
-    $.createClass = createClass;
-    $.extendClass = extendClass;
-    $.Events = function() {
+    var alwaysfalse = always(false);
+    var alwaystrue = always(true);
+    var nothing = function() {};
+    var alwayslist0 = always([]);
+    var alwaysnull = always(null);
+    var identity = function(x) {
+        return x };
+    /**
+     * [closure]
+     * @type {[function]}
+     */
+    var isArray = Array.isArray || isType('Array');
+    var MAX_ARRAY_INDEX = Math.pow(2, 53) - 1;
+    var isArrayLike = function(list) {
+        var l = existy(list) && list.length;
+        return typeof l == 'number' && l >= 0 && l <= MAX_ARRAY_INDEX;
+    };
+    var isPureObject = isType('Object');
+    var isFunction = isType('Function');
+    var isNaN = function(x) {
+        return x !== x; };
+    var isInfiniteNumer = function(x) {
+        return x === Infinity || x === -Infinity;
+    };
+    var isNumber = isType('Number');
+    var isFiniteNumber = function(x) {
+        return isNumber(x) && !isNaN(x) && x !== -Infinity && x !== Infinity;
+    };
+    var isPositive = function(x) {
+        return x > 0; };
+    var isNegative = function(x) {
+        return x < 0; };
+    var isString = isType('String');
+    var isBoolean = isType('Bollen');
+    var isRegExp = isType('RegExp');
+    var isUndefined = isType('Undefined');
+    var isNull = isType('Null');
+    var apply = uncurrying(_apply);
+    var call = uncurrying(_call);
+    var has = uncurrying(_has);
+    var $1slice = uncurrying(_$1slice);
+    var toArray = fcheck(curry2r($1slice)(0), function(x) {
+        return existy(x) }, []);
+    var keys = fcheck(dispatch(_keys, $1keys),
+        existy,
+        alwayslist0
+    );
+    var slice = dispatch(invoker('slice',_$1slice)
+                        ,invoker('slice',_$2slice));
+    var allKeys = fcheck($1allKeys, existy, alwayslist0);
+    var defaults = createAssigner(keys, true);
+    var defaultsAll = createAssigner(allKeys, true);
+    var extend = createAssigner(allKeys);
+    var assign = createAssigner(keys);
+    var clone = partial1(assign, {});
+    var reduce = fcheck(dispatch(invoker('reduce', _reduce), $1reduce),
+        isArrayLike,
+        function(xs, f, seed) {
+            return seed }
+    );
+    var map = fcheck(dispatch(invoker('map', _map), 
+        fcheck($1map,isArrayLike,alwaysnull),$2map),
+        existy,
+        alwayslist0
+    );
+    var indexOf=dispatch(invoker('indexOf',_$1indexOf),
+                         invoker('indexOf',_$2indexOf),
+                         fcheck($1indexOf,isArrayLike,-1)
+                            );
 
-        function on(event, callback, context, once) {
-            this._events || (this._events = {});
-            var tmp = this._events[event];
-            this._events[event] = isArray(tmp) ? tmp : [];
-            this._events[event].push({
-                callback: callback,
-                context: context,
-                once: once
-            });
+
+    // function uncurrying(method) {
+    //     return function() {
+    //         var args = _slice.call(arguments);
+    //         var context = _shift.call(args);
+    //         return method.apply(context, args);
+    //     }
+    // }
+
+    /**
+     * [map a.f(b,c,...) to f(a,b,c,...)]
+     * @param  {[function]} method [a.f(b,c,...)]
+     * @return {[function]}        [f(a,b,c,...)]
+     */
+
+
+    function existy(x) {
+        return x != null; }
+
+    function truthy(x) {
+        return existy(x) && x !== false; }
+
+    function isType(type) {
+        return function(x) {
+            return _toString.call(x) == '[object ' + type + ']';
         }
-        return {
-            on: function(event, callback, context) {
-                on.call(this, event, callback, context);
-            },
-            off: function(event, callback) {
-                if (!event) return this._events = void 0;
-                if (!this._events) return this._events = void 0;
-                if (!isArray(this._events[event])) return this._events[event] = void 0;
-                if (!callback) return this._events[event] = void 0;
-                this._events[event] = map(this._events[event], function(x, k, xs) {
-                    return x.callback === callback ? null : x;
-                });
-            },
-            trigger: function(event) {
-                if (!this._events) return;
-                if (!isArray(this._events[event])) return;
-                var that = this;
-                var args = Array.prototype.slice.call(arguments, 1);
-                this._events[event] = map(this._events[event], function(x) {
-                    x.callback.apply(x.context || that, args);
-                    return x.once ? null : x;
-                });
-            },
-            once: function(event, callback, context) {
-                on.call(this, event, callback, context, true);
-            }
+    }
+
+    function always(x) {
+        return function() {
+            return x;
+        }
+    }
+
+    function ifelse(question, right, wrong) {
+        return question ? (isFunction(right) ? right() : right) : (isFunction(wrong) ? wrong() : wrong);;
+    }
+
+    function uncurrying(method) {
+        return function() {
+            return _call.apply(method, arguments);
+        }
+    }
+
+    function invoker(methodName, method) {
+        return function(target) {
+            var args = arguments;
+            return ifelse(
+                existy(target) && isFunction(method) && method === target[methodName],
+                function() {
+                    return _call.apply(method, args);
+                },
+                null
+            );
+        }
+    }
+
+    function curry1(f) {
+        return function(arg1) {
+            return f(arg1);
         };
-    }();
-    $.oning = oning;
-    $.listenTo = listenTo;
-    $.listenToOnce = listenToOnce;
-    $.stopListening = stopListening;
-    var device = function() {//copy others
-        var device,
-            find,
-            userAgent;
-        device = {};
+    }
 
-        userAgent = window.navigator.userAgent.toLowerCase();
-
-        device.ios = function() {
-            return device.iphone() || device.ipod() || device.ipad();
+    function curry2r(f) {
+        return function(arg2) {
+            return function(arg1) {
+                return f(arg1, arg2);
+            };
         };
+    }
 
-        device.iphone = function() {
-            return !device.windows() && find('iphone');
+    function curry3r(f) {
+        return function(arg3) {
+            return function(arg2) {
+                return function(arg1) {
+                    return f(arg1, arg2, arg3);
+                };
+            };
         };
+    }
 
-        device.ipod = function() {
-            return find('ipod');
-        };
 
-        device.ipad = function() {
-            return find('ipad');
-        };
-
-        device.android = function() {
-            return !device.windows() && find('android');
-        };
-
-        device.androidPhone = function() {
-            return device.android() && find('mobile');
-        };
-
-        device.androidTablet = function() {
-            return device.android() && !find('mobile');
-        };
-
-        device.blackberry = function() {
-            return find('blackberry') || find('bb10') || find('rim');
-        };
-
-        device.blackberryPhone = function() {
-            return device.blackberry() && !find('tablet');
-        };
-
-        device.blackberryTablet = function() {
-            return device.blackberry() && find('tablet');
-        };
-
-        device.windows = function() {
-            return find('windows');
-        };
-
-        device.windowsPhone = function() {
-            return device.windows() && find('phone');
-        };
-
-        device.windowsTablet = function() {
-            return device.windows() && (find('touch') && !device.windowsPhone());
-        };
-
-        device.fxos = function() {
-            return (find('(mobile;') || find('(tablet;')) && find('; rv:');
-        };
-
-        device.fxosPhone = function() {
-            return device.fxos() && find('mobile');
-        };
-
-        device.fxosTablet = function() {
-            return device.fxos() && find('tablet');
-        };
-
-        device.meego = function() {
-            return find('meego');
-        };
-
-        device.cordova = function() {
-            return window.cordova && location.protocol === 'file:';
-        };
-
-        device.nodeWebkit = function() {
-            return typeof window.process === 'object';
-        };
-
-        device.mobile = function() {
-            return device.androidPhone() || device.iphone() || device.ipod() || device.windowsPhone() || device.blackberryPhone() || device.fxosPhone() || device.meego() || device.tablet();
-        };
-
-        device.tablet = function() {
-            return device.ipad() || device.androidTablet() || device.blackberryTablet() || device.windowsTablet() || device.fxosTablet();
-        };
-
-        device.desktop = function() {
-            return !device.tablet() && !device.mobile();
-        };
-
-        device.television = function() {
-            var i, tvString;
-
-            television = [
-                "googletv",
-                "viera",
-                "smarttv",
-                "internet.tv",
-                "netcast",
-                "nettv",
-                "appletv",
-                "boxee",
-                "kylo",
-                "roku",
-                "dlnadoc",
-                "roku",
-                "pov_tv",
-                "hbbtv",
-                "ce-html"
-            ];
-
-            i = 0;
-            while (i < television.length) {
-                if (find(television[i])) {
-                    return true;
-                }
-                i++;
-            }
-            return false;
-        };
-
-        device.portrait = function() {
-            return (window.innerHeight / window.innerWidth) > 1;
-        };
-
-        device.landscape = function() {
-            return (window.innerHeight / window.innerWidth) < 1;
-        };
-        find = function(needle) {
-            return userAgent.indexOf(needle) !== -1;
-        };
-        return device;
-    }();
-    $.device = device;
-
-    function plain() {}
 
     function dispatch() {
         var args = arguments;
-        var x, r = null;
-        for (var i = 0, l = args.length; i < l; ++i) {
-            x = args[i];
-            r = isFunction(x) ? x : null;
-            if (r !== null) return r;
-        }
-        return plain;
-    }
-
-    function $1Promise(fn) {
-        var value;
-        var state = 'pending';
-        var thunks = [];
-        var errors = [];
-        var promise;
-        var flag = false;
-
-        function resolve(val) {
-            if (flag) return;
-            flag = true;
-            setTimeout(function() {
-                value = val;
-                state = 'fulfilled';
-                thunks = next(value, thunks);
-            }, 0);
-        }
-
-        function reject(err) {
-            if (flag) return;
-            flag = true;
-            setTimeout(function() {
-                value = err;
-                state = 'rejected';
-                errors = next(value, errors);
-            }, 0);
-        }
-
-        function next(value, list) {
-            if (list.length === 0) return [];
-            list[0](value);
-            next(value, slice.call(list, 1));
-        }
-
-        function dispatch(onFulfilled, onRejected) {
-            if (state === 'pending') {
-                thunks.push(onFulfilled);
-                errors.push(onRejected);
-            }
-            if (state === 'fulfilled' && f) {
-                setTimeout(function() {
-                    next(next_value, value, [onFulfilled], 0);
-                }, 0);
-            }
-            if (state === 'rejected' && r) {
-                setTimeout(function() {
-                    next(next_error, value, [onRejected], 1);
-                }, 0);
+        for (var i = 0, l = arguments.length; i < l; ++i) {
+            if (!isFunction(args[i])) {
+                args[i] = alwaysnull;
             }
         }
-
-        function wrapper(f, flag, resolve, reject) {
-            var k = flag ? function(x) { reject(x) } : function(x) { resolve(x) };
-            return isFunction(f) ? function(x) {
-                try {
-                    _call(f(x), resolve, reject);
-                } catch (error) {
-                    reject(error);
+        return function() {
+            var ret;
+            for (var i = 0, l = args.length; i < l; i++) {
+                if (!isNull(ret = apply(args[i], null, arguments))) {
+                    return ret;
                 }
-            } : k;
-        }
-
-        function _call(value, resolve, reject) {
-            if (value && value.__type__ === plain) {
-                value.then(resolve, reject);
-            } else {
-                resolve(value);
             }
+            return null;
         }
+    }
 
-        try {
-            fn(resolve, reject);
-        } catch (error) {
-            reject(error);
+    function fcheck(f, check, fail) {
+        return function() {
+            return truthy(apply(check, null, arguments)) ? apply(f, null, arguments) : (isFunction(fail) ? apply(fail, null, arguments) : fail);
         }
-        return {
-            then: function(onFulfilled, onRejected) {
-                return new $1Promise(function(resolve, reject) {
-                    dispatch(wrapper(onFulfilled, 0, resolve, reject),
-                        wrapper(onRejected, 1, resolve, reject));
+    }
+
+    function ftransform(f, transform) {
+        return function() {
+            return apply(f, null, apply(transform, null, arguments));
+        }
+    }
+
+    function initial(array, n) {
+        return n = isFiniteNumber(n) ? n : 1, existy(array) ? $1slice(array, 0, _max(0, array.length - (isNegative(n) ? 1 : n))) : [];
+    }
+
+    function rest(array, n) {
+        return n = isFiniteNumber(n) ? n : 1, existy(array) ? $1slice(array, isNegative(n) ? 1 : n) : [];
+    }
+
+    function first(array, n) {
+        if (!existy(array)) return void 0;
+        if (!existy(n)) return array[0];
+
+        return n = isPositive(n) || n === 0 ? n : 1, $1slice(array, 0, n);
+    }
+
+    function last(array, n) {
+        if (!existy(array)) return void 0;
+        if (!existy(n)) return array[array.length - 1];
+        return n = isPositive(n) || n === 0 ? n : 1, $1slice(array, _max(0, array.length - n));
+    }
+
+    function $1map(array, f, ctx) {
+        var ret = [];
+        for (var i = 0, l = array.length; i < l; ++i) {
+            ret[i] = call(f, ctx, array[i], i, array);
+        }
+        return ret;
+    }
+
+    function $2map(object,f,ctx){
+        var _keys=keys(object);
+        var ret=[];
+        var key;
+        for(var i=0,l=_keys.length;i<l;++i){
+            key=_keys[i];
+            ret[i]=call(f,ctx,object[key],key,object);
+        }
+        return ret;
+    }
+
+    function $1reduce(array, f, seed, ctx) {
+        var i = 0;
+        seed = existy(seed) ? seed : array[i++];
+        for (var l = array.length; i < l; ++i) {
+            seed = call(f, ctx, seed, array[i], i, array);
+        }
+        return seed;
+    }
+
+    function cat(xs) {
+        var args = arguments;
+        return ifelse(
+            isArrayLike(xs),
+            function() {
+                args = map(rest(args), function(x) {
+                    if (!isArray(x) && isArrayLike(x)) {
+                        return toArray(x);
+                    } else {
+                        return x;
+                    }
                 });
-            },
-            'catch': function(onRejected) {
-                return this.then(null, onRejected);
-            },
-            __type__: plain
+                return apply(_concat, isArray(xs) ? xs : toArray(xs), args);
+            }, []
+        );
+    }
+
+    function $1keys(obj) {
+        var keys = [];
+        for (var k in obj) {
+            if (has(obj, k)) {
+                keys[keys.length] = k;
+            }
+        }
+        return keys;
+    }
+
+    function $1allKeys(obj) {
+        var keys = [];
+        for (var k in obj) {
+            keys[keys.length] = k;
+        }
+        return keys;
+    }
+
+    function leader(fn) {
+        return apply(fn, null, rest(arguments));
+    }
+
+    function leaders(fn, args) {
+        return apply(fn, null, args);
+    }
+
+    function $1indexOf(arrayLike,x){
+        var ret=-1;
+        map(arrayLike,function(x,k){
+            if(x===arrayLike[k])ret=k;
+        });
+        return ret;
+    }
+
+
+
+
+    function partial1(fn) {
+        var args = rest(arguments);
+        return function() {
+            return apply(fn, null, cat(args, arguments));
         };
-    }
-    $1Promise.resolve = function(x) {
-        return new $1Promise(function(resolve, reject) {
-            resolve(x);
-        });
-    };
-
-    $1Promise.reject = function(x) {
-        return new $1Promise(function(resolve, reject) {
-            reject(x);
-        });
-    };
-
-    $1Promise.all = function(args) {
-        return new $1Promise(function(resolve, reject) {
-            for (var i = 0, l = args.length, all = new Array(l),allResults=[]; i < l; ++i) {
-                !function(i) {
-                    var tmp=args[i].__type__===plain?args[i]:$1Promise.resolve(args[i]);
-                    tmp.then(function(value) {
-                        all[i]=true;
-                        allResults[i]=value;
-                        var flag=true;
-                        for(var j=0,l=args.length;i<l;++i){
-                            if(!all[i])flag=false;
-                        }
-                        if(flag)resolve(allResults);
-                    }, function(error) {
-                        reject(error);
-                    });
-                }(i);
-            }
-        });
-    }
-
-    function createClass(className, proto) { //class system
-        var $class = function() {
-            proto.initialize && proto.initialize.apply(this, arguments);
-        };
-        plain.prototype = proto;
-        var _proto = new plain;
-        _proto.constructor = $class;
-        _proto.__type = className;
-        $class.prototype = _proto;
-        $class.type = className;
-        return $class;
-    }
-
-    function extendClass(className, superclass, proto) {
-        var $child = function() {
-            superclass.apply(this, arguments);
-            proto.initialize && proto.initialize.apply(this, arguments);
-        };
-        plain.prototype = superclass.prototype;
-        var _proto = new plain;
-        $child.prototype = _proto;
-        extend(_proto, proto);
-        _proto.constructor = $child;
-        _proto.__type = className;
-        $child.type = className;
-        return $child;
-    }
-
-    function Type(type) {
-        return function(x) {
-            return Object.prototype.toString.call(x) === '[object ' + type + ']';
-        }
-    }
-
-    function listenTo(reporter, event, callback, context) {
-        if (!reporter) return;
-        if (reporter.on !== $.Events.on) $.extend(reporter, $.Events);
-        reporter.on(event, callback, context);
-    }
-
-    function style(opts) {
-        $.map(this, function(x) {
-            var style = x.style;
-            $.map(opts, function(x, k) {
-                style[k] = x;
-            });
-        });
-        return this;
-    }
-
-    function oning(reporter) {
-        if (!reporter) return;
-        if (reporter.on !== $.Events.on) $.extend(reporter, $.Events);
-        return reporter;
-    }
-
-    function listenToOnce(reporter, event, callback, context) {
-        if (!reporter) return;
-        if (reporter.once !== $.Events.once) $.extend(reporter, $.Events);
-        reporter.once(event, callback, context);
-    }
-
-    function stopListening(reporter, event, callback) {
-        if (!reporter) return;
-        if (reporter.on !== $.Events.on) return;
-        reporter.off(event, callback);
-    }
-
-    function extend(target, source) {
-        for (var i in source) {
-            if (Object.prototype.hasOwnProperty.call(source, i)) {
-                target[i] = source[i];
-            }
-        }
-    }
-
-    $.fn = $$.prototype = $.prototype;
-    $.fn.html = html;
-    $.fn.get = get;
-    $.fn.on = on;
-    $.fn.off = off;
-    $.fn.attr = attr;
-    $.fn.find = find;
-    $.fn.css = style;
-
-    function attr(name, value) {
-        if (name === 'html') {
-            if (isString(value)) {
-                $.map(this, function(x) {
-                    x.innerHTML = value;
-                });
-                return this;
-            } else {
-                return this[0] ? this[0].innerHTML : void 0;
-            }
-        }
-        if (isString(name) && isString(value)) {
-            $.map(this, function(x) {
-                x.setAttribute(name, value);
-            });
-            return this;
-        }
-        if (isString(name) && !isString(value)) {
-            return this[0] ? this[0].getAttribute(name) : void 0;
-        }
-    }
-
-    var $on = function $on() {
-        if (window.addEventListener) {
-            return function(node, ev, fn) {
-                node.addEventListener(ev, fn, false);
-            }
-        } else if (window.attachEvent) {
-            return function(node, ev, fn) {
-                node.attachEvent('on' + ev, fn);
-            }
-        }
-    }();
-
-    var $off = function $off() {
-        if (window.removeEventListener) {
-            return function(node, ev, fn) {
-                node.removeEventListener(ev, fn, false);
-            }
-        } else if (window.detachEvent) {
-            return function(node, ev, fn) {
-                node.detachEvent('on' + ev, fn);
-            }
-        }
-    }();
-
-    function $(selector, context) {
-        return new $$(selector, context);
-    }
-
-    function $$(selector, context) {
-        return isString(selector) ? css(selector, this) : wrapper(selector, this), this;
-    }
-
-    function wrapper(node, that) {
-        node == null ? that : that.push(node);
-    }
-
-    function get(n) {
-        return this[n];
-    }
-
-    function html(html) {
-        var ret,
-            title = Object.prototype.toString.call(html),
-            flag = (title === '[object String]' || title === '[object Function]');
-        return ret = map(this, function(x, i, xs) {
-            return flag ? (x.innerHTML = title === '[object Function]' ? html() : html) : x.innerHTML;
-        }), flag ? this : ret;
-    }
-
-    function on(type, fn) {
-        return map(this, function(node, index, nodes) {
-            $on(node, type, fn);
-        }), this;
-    }
-
-    function off(type, fn) {
-        return map(this, function(node, index, nodes) {
-            $off(node, type, fn);
-        }), this;
     }
 
     /**
-     * [only for id and tagname]
-     * @param  {[type]} selector [description]
-     * @return {[type]}          [description]
+     * [bind description]
+     * @return {[type]} [description]
      */
-    function css(selector, that) {
-        if (selector.charAt(0) === '#') {
-            return that.push(document.getElementById(selector.slice(1))), that;
-        } else {
-            return that.push.apply(that, document.getElementsByTagName(selector));
-        }
-    }
-
-    function find(tagName) {
-        var that = $();
-        $.map(this, function(x) {
-            that.push.apply(that, x.getElementsByTagName(tagName));
-        });
-        return that;
-    }
-
-
-    function uuid() {
-        return new Date().getTime().toString(16) + '-' + 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            var r = Math.random() * 16 | 0,
-                v = c == 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-        });
-    }
-
-    function camelCase(str) { //first letter upperCase
-        return str.replace(/^\w/, function(s) {
-            return s.toUpperCase();
-        });
-    }
-
-    function getCookie(name) {
-        var arr = document.cookie.match(new RegExp("(^| )" + name + "=([^;]*)(;|$)"));
-        if (arr != null) return unescape(arr[2]);
-        return null;
-
-    }
-
-    function setCookie(name, value, days) {
-        days = days || 30;
-        var exp = new Date();
-        exp.setTime(exp.getTime() + days * 24 * 60 * 60 * 1000);
-        document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString();
-    }
-
-    function min(array) {
-        return Math.min.apply(Math, array);
-    }
-
-    function compile(str, data) { //copy other's,compile tmp to function that can output html by data
-        var fn =
-            new Function("obj",
-                "var p=[],print=function(){p.push.apply(p,arguments);};" +
-                "with(obj){p.push('" +
-                str
-                .replace(/[\r\t\n]/g, " ")
-                .split("<%").join("\t")
-                .replace(/((^|%>)[^\t]*)'/g, "$1\r")
-                .replace(/\t=(.*?)%>/g, "',$1,'")
-                .split("\t").join("');")
-                .split("%>").join("p.push('")
-                .split("\r").join("\\'") + "');}return p.join('');");
-        return data ? fn(data) : fn;
-    }
-
-    function loadImg(url, fn) { //浏览器的bug，等函数调用完毕后，可能把图片对象给注销了，而它根本没有来得及发出请求
-        //所以把图片对象注册到全局作用域上，等图片下载完毕再清除全局量
-        var id = 'img' + (Math.random() + '').replace('.', '');
-        var img = window[id] = new Image();
-        img.onload = function() {
-            fn && fn();
-            window[id] = null;
-        };
-        img.src = url;
-    }
-
-    function jsonp(url, data, conf, cb, cache) {
-        var conf = conf || [];
-        var key = conf[0] || 'cb';
-        var value = (conf[1] || 'defaults') + (false ? '' : (Math.random() + '').replace('.', ''));
-        data[key] = value;
-
-        var arr = [];
-        for (var i in data) {
-            if (data.hasOwnProperty(i)) {
-                arr.push(i + '=' + encodeURIComponent(data[i]));
-            }
-        }
-        var str = arr.join('&');
-        window[value] = function(json) {
-            cb(json);
-            oHead.removeChild(oS);
-            window[data.cb] = null;
-        };
-        var oS = document.createElement('script');
-        oS.src = url + '?' + str;
-        var oHead = document.getElementsByTagName('head')[0];
-        oHead.appendChild(oS);
-    }
-
-    function getNodeSize(node) {
-        var width;
-        var height;
-        var tmp;
-
-        if (node.getBoundingClientRect) {
-            tmp = node.getBoundingClientRect();
-            width = tmp.right - tmp.left;
-            height = tmp.bottom - tmp.top;
-
-        } else {
-            width = node.offsetWidth;
-            height = node.offsetHeight;
-        }
-        return {
-            width: width,
-            height: height
-        }
-    }
-
-    function getNodePositionInDocument(node) {
-        var offsetParent = node.offsetParent;
-        var top = 0;
-        var left = 0;
-        while (offsetParent) {
-            top += node.offsetTop;
-            left += node.offsetLeft;
-            node = offsetParent;
-            offsetParent = node.offsetParent;
-        }
-        return {
-            left: left,
-            top: top
+    function bind(fn, ctx) {
+        var args = rest(arguments, 2);
+        return function() {
+            fn.apply(ctx, cat(args, arguments));
         };
     }
 
-    function getNodePositionInViewport(node) {
-        var documentLeft = getDocumentScrollLeft();
-        var documentTop = getDocumentScrollTop();
-        var positionInDocument = getNodePositionInDocument(node);
-        var leftInViewport = positionInDocument.left - documentLeft;
-        var topInViewport = positionInDocument.top - documentTop;
-        var size = getNodeSize(node);
-        return {
-            left: leftInViewport,
-            top: topInViewport,
-            right: leftInViewport + size.width,
-            bottom: topInViewport + size.height
-        }
-    }
-
-    function getDocumentScrollLeft() {
-        return document.documentElement.scrollLeft || document.body.scrollLeft;
-    }
-
-    function getDocumentScrollTop() {
-        return document.documentElement.scrollTop || document.body.scrollTop;
-    }
-
-    function getViewportWidth() {
-        var maybeArray = [window.innerWidth,
-            document.documentElement.clientWidth,
-            document.body.clientWidth
-        ];
-        maybeArray = map(maybeArray, function(i) {
-            i = parseInt(i);
-            if (!(i && i > 0)) return null;
-            return i;
-        });
-        return min(maybeArray);
-    }
-
-    function getViewportHeight() {
-        var maybeArray = [window.innerHeight,
-            document.documentElement.clientHeight,
-            document.body.clientHeight
-        ];
-        maybeArray = map(maybeArray, function(i) {
-            i = parseInt(i);
-            if (!(i && i > 0)) return false;
-            return i;
-        });
-        return min(maybeArray);
-    }
-
-    function isInViewport(node) {
-        var viewportWidth = getViewportWidth();
-        var viewportHeight = getViewportHeight();
-        var positionInViewport = getNodePositionInViewport(node);
-        return !(positionInViewport.right <= 0 || positionInViewport.left >= viewportWidth || positionInViewport.bottom <= 0 || positionInViewport.top >= viewportHeight);
-    }
-
-    function map(array, fn, ctx) { //iterator array or object
-        var arr = [],
-            tmp,
-            type = Object.prototype.toString.call(array);
-        if (!((typeof array.length === 'number') || isObject(array))) return;
-        if (Object.prototype.toString.call(fn) === '[object Function]') {
-            if (typeof array.length === 'number') {
-                for (var i = 0, l = array.length; i < l; ++i) {
-                    if ((tmp = fn.call(ctx, array[i], i, array)) != null) {
-                        arr.push(tmp);
-                    }
-                }
-            } else {
-                for (var i in array) {
-                    if (Object.prototype.hasOwnProperty.call(array, i) && ((tmp = fn.call(ctx, array[i], i, array)) != null)) {
-                        arr.push(tmp);
+    function createAssigner(keysF, undefinedOnly) {
+        return function(obj) {
+            var l = arguments.length;
+            if (l < 2 || !existy(obj)) return obj;
+            for (var i = 1; i < l; ++i) {
+                var source = arguments[i];
+                var keys = keysF(source);
+                var key;
+                for (var j = 0, n = keys.length; j < n; ++j) {
+                    key = keys[j];
+                    if (!undefinedOnly || isUndefined(obj[key])) {
+                        obj[key] = source[key];
                     }
                 }
             }
-            return arr;
-        } else {
-            var then = function(fn) { //closure
-                return map(array, Object.prototype.toString.call(fn) == '[object Function]' ? fn : function() {});
-            }
-            return then.then = then;
+            return obj;
         }
     }
-    return $;
+
+
+    function compose() {
+        var args = arguments;
+        return function() {
+            var l = args.length;
+            var result = args[--l].apply(null, arguments);
+            while (l--) {
+                result = args[l].call(null, result)
+            }
+            return result;
+        }
+    }
+
+    return {
+        existy: existy,
+        truthy: truthy,
+        isArray: isArray,
+        isArrayLike: isArrayLike,
+        isPureObject: isPureObject,
+        isFunction: isFunction,
+        isNaN: isNaN,
+        isInfiniteNumer: isInfiniteNumer,
+        isNumber: isNumber,
+        isFiniteNumber: isFiniteNumber,
+        isString: isString,
+        isBoolean: isBoolean,
+        isRegExp: isRegExp,
+        isUndefined: isUndefined,
+        isNull: isNull,
+
+        always: always,
+        ifelse: ifelse,
+        identity: identity,
+        alwaysfalse: alwaysfalse,
+        alwaystrue: alwaystrue,
+
+        uncurrying: uncurrying,
+        invoker: invoker,
+        curry1: curry1,
+        curry2r: curry2r,
+        curry3r: curry3r,
+        apply: apply,
+        call: call,
+
+        dispatch: dispatch,
+        fcheck: fcheck,
+        ftransform: ftransform,
+
+        slice: slice,
+        toArray: toArray,
+        initial: initial,
+        rest: rest,
+        first: first,
+        last: last,
+        defaults: defaults,
+        defaultsAll: defaultsAll,
+        extend: extend,
+        assign: assign,
+        clone: clone,
+        map: map,
+        reduce: reduce,
+        cat: cat,
+        keys: keys,
+        allKeys: allKeys,
+        indexOf:indexOf,
+
+        partial1: partial1,
+        bind: bind,
+        leader: leader,
+        leaders: leaders,
+        compose: compose
+    }
+
 }
