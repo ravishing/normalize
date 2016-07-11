@@ -34,7 +34,8 @@ function() {
     var _has = ObjectProto.hasOwnProperty;
     var _toString = ObjectProto.toString;
     var _keys = ObjectProto.keys;
-    var _slice = ArrayProto.slice;
+    var _$1slice = ArrayProto.slice;
+    var _$2slice = StringProto.slice;
     var _shift = ArrayProto.shift;
     var _concat = ArrayProto.concat;
     var _reduce = ArrayProto.reduce;
@@ -85,13 +86,15 @@ function() {
     var apply = uncurrying(_apply);
     var call = uncurrying(_call);
     var has = uncurrying(_has);
-    var slice = uncurrying(_slice);
-    var toArray = fcheck(curry2r(slice)(0), function(x) {
+    var $1slice = uncurrying(_$1slice);
+    var toArray = fcheck(curry2r($1slice)(0), function(x) {
         return existy(x) }, []);
     var keys = fcheck(dispatch(_keys, $1keys),
         existy,
         alwayslist0
     );
+    var slice = dispatch(invoker('slice',_$1slice)
+                        ,invoker('slice',_$2slice));
     var allKeys = fcheck($1allKeys, existy, alwayslist0);
     var defaults = createAssigner(keys, true);
     var defaultsAll = createAssigner(allKeys, true);
@@ -227,24 +230,24 @@ function() {
     }
 
     function initial(array, n) {
-        return n = isFiniteNumber(n) ? n : 1, existy(array) ? slice(array, 0, _max(0, array.length - (isNegative(n) ? 1 : n))) : [];
+        return n = isFiniteNumber(n) ? n : 1, existy(array) ? $1slice(array, 0, _max(0, array.length - (isNegative(n) ? 1 : n))) : [];
     }
 
     function rest(array, n) {
-        return n = isFiniteNumber(n) ? n : 1, existy(array) ? slice(array, isNegative(n) ? 1 : n) : [];
+        return n = isFiniteNumber(n) ? n : 1, existy(array) ? $1slice(array, isNegative(n) ? 1 : n) : [];
     }
 
     function first(array, n) {
         if (!existy(array)) return void 0;
         if (!existy(n)) return array[0];
 
-        return n = isPositive(n) || n === 0 ? n : 1, slice(array, 0, n);
+        return n = isPositive(n) || n === 0 ? n : 1, $1slice(array, 0, n);
     }
 
     function last(array, n) {
         if (!existy(array)) return void 0;
         if (!existy(n)) return array[array.length - 1];
-        return n = isPositive(n) || n === 0 ? n : 1, slice(array, _max(0, array.length - n));
+        return n = isPositive(n) || n === 0 ? n : 1, $1slice(array, _max(0, array.length - n));
     }
 
     function $1map(array, f, ctx) {
