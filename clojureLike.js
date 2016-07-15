@@ -13,7 +13,7 @@ function() {
     var Array = root.Array;
     var Object = root.Object;
     var Function = root.Function;
-    var String=root.String;
+    var String = root.String;
     var Math = root.Math;
 
     /**
@@ -23,7 +23,7 @@ function() {
     var ArrayProto = Array.prototype;
     var ObjectProto = Object.prototype;
     var FunctionProto = Function.prototype;
-    var StringProto=String.prototype;
+    var StringProto = String.prototype;
 
     /**
      * [native code]
@@ -33,15 +33,15 @@ function() {
     var _call = FunctionProto.call;
     var _has = ObjectProto.hasOwnProperty;
     var _toString = ObjectProto.toString;
-    var _keys = ObjectProto.keys;
+    var _keys = Object.keys;
     var _$1slice = ArrayProto.slice;
     var _$2slice = StringProto.slice;
     var _shift = ArrayProto.shift;
     var _concat = ArrayProto.concat;
     var _reduce = ArrayProto.reduce;
     var _map = ArrayProto.map;
-    var _$1indexOf=StringProto.indexOf;
-    var _$2indexOf=ArrayProto.indexOf;
+    var _$1indexOf = StringProto.indexOf;
+    var _$2indexOf = ArrayProto.indexOf;
     var _max = Math.max;
 
 
@@ -52,7 +52,8 @@ function() {
     var alwayslist0 = always([]);
     var alwaysnull = always(null);
     var identity = function(x) {
-        return x };
+        return x
+    };
     /**
      * [closure]
      * @type {[function]}
@@ -66,7 +67,8 @@ function() {
     var isPureObject = isType('Object');
     var isFunction = isType('Function');
     var isNaN = function(x) {
-        return x !== x; };
+        return x !== x;
+    };
     var isInfiniteNumer = function(x) {
         return x === Infinity || x === -Infinity;
     };
@@ -75,26 +77,28 @@ function() {
         return isNumber(x) && !isNaN(x) && x !== -Infinity && x !== Infinity;
     };
     var isPositive = function(x) {
-        return x > 0; };
+        return x > 0;
+    };
     var isNegative = function(x) {
-        return x < 0; };
+        return x < 0;
+    };
     var isString = isType('String');
     var isBoolean = isType('Bollen');
     var isRegExp = isType('RegExp');
-    var isUndefined = isType('Undefined');
-    var isNull = isType('Null');
+    var isUndefined = isSame(void 0);
+    var isNull = isSame(null);
     var apply = uncurrying(_apply);
     var call = uncurrying(_call);
     var has = uncurrying(_has);
     var $1slice = uncurrying(_$1slice);
     var toArray = fcheck(curry2r($1slice)(0), function(x) {
-        return existy(x) }, []);
+        return existy(x)
+    }, []);
     var keys = fcheck(dispatch(_keys, $1keys),
         existy,
         alwayslist0
     );
-    var slice = dispatch(invoker('slice',_$1slice)
-                        ,invoker('slice',_$2slice));
+    var slice = dispatch(invoker('slice', _$1slice), invoker('slice', _$2slice));
     var allKeys = fcheck($1allKeys, existy, alwayslist0);
     var defaults = createAssigner(keys, true);
     var defaultsAll = createAssigner(allKeys, true);
@@ -104,17 +108,18 @@ function() {
     var reduce = fcheck(dispatch(invoker('reduce', _reduce), $1reduce),
         isArrayLike,
         function(xs, f, seed) {
-            return seed }
+            return seed
+        }
     );
-    var map = fcheck(dispatch(invoker('map', _map), 
-        fcheck($1map,isArrayLike,alwaysnull),$2map),
+    var map = fcheck(dispatch(invoker('map', _map),
+            fcheck($1map, isArrayLike, alwaysnull), $2map),
         existy,
         alwayslist0
     );
-    var indexOf=dispatch(invoker('indexOf',_$1indexOf),
-                         invoker('indexOf',_$2indexOf),
-                         fcheck($1indexOf,isArrayLike,-1)
-                            );
+    var indexOf = dispatch(invoker('indexOf', _$1indexOf),
+        invoker('indexOf', _$2indexOf),
+        fcheck($1indexOf, isArrayLike, -1)
+    );
 
 
     // function uncurrying(method) {
@@ -133,14 +138,22 @@ function() {
 
 
     function existy(x) {
-        return x != null; }
+        return x != null;
+    }
 
     function truthy(x) {
-        return existy(x) && x !== false; }
+        return existy(x) && x !== false;
+    }
 
     function isType(type) {
         return function(x) {
             return _toString.call(x) == '[object ' + type + ']';
+        }
+    }
+
+    function isSame(x) {
+        return function(y) {
+            return x === y;
         }
     }
 
@@ -258,13 +271,13 @@ function() {
         return ret;
     }
 
-    function $2map(object,f,ctx){
-        var _keys=keys(object);
-        var ret=[];
+    function $2map(object, f, ctx) {
+        var _keys = keys(object);
+        var ret = [];
         var key;
-        for(var i=0,l=_keys.length;i<l;++i){
-            key=_keys[i];
-            ret[i]=call(f,ctx,object[key],key,object);
+        for (var i = 0, l = _keys.length; i < l; ++i) {
+            key = _keys[i];
+            ret[i] = call(f, ctx, object[key], key, object);
         }
         return ret;
     }
@@ -321,10 +334,10 @@ function() {
         return apply(fn, null, args);
     }
 
-    function $1indexOf(arrayLike,x){
-        var ret=-1;
-        map(arrayLike,function(x,k){
-            if(x===arrayLike[k])ret=k;
+    function $1indexOf(arrayLike, x) {
+        var ret = -1;
+        map(arrayLike, function(x, k) {
+            if (x === arrayLike[k]) ret = k;
         });
         return ret;
     }
@@ -433,7 +446,7 @@ function() {
         cat: cat,
         keys: keys,
         allKeys: allKeys,
-        indexOf:indexOf,
+        indexOf: indexOf,
 
         partial1: partial1,
         bind: bind,

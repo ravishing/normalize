@@ -9,7 +9,7 @@ function() {
     var Array = root.Array;
     var Math = root.Math;
     var slice = Array.prototype.slice;
-    var encodeURIComponent=root.encodeURIComponent;
+    var encodeURIComponent = root.encodeURIComponent;
 
 
     var isArray = Type('Array');
@@ -20,11 +20,11 @@ function() {
     $.prototype = [];
     $.prototype.constructor = $;
     $.uuid = uuid;
-    $.bin2hex=bin2hex;
+    $.bin2hex = bin2hex;
     $.Promise = dispatch(Promise, $1Promise);
-    $.encodeURIComponent=encodeURIComponent;
+    $.encodeURIComponent = encodeURIComponent;
     $.dispatch = dispatch;
-    $.random=random;
+    $.random = random;
     $.isInViewport = isInViewport;
     $.compile = compile;
     $.camelCase = camelCase;
@@ -80,7 +80,7 @@ function() {
     $.listenTo = listenTo;
     $.listenToOnce = listenToOnce;
     $.stopListening = stopListening;
-    var device = function() {//copy others
+    var device = function() { //copy others
         var device,
             find,
             userAgent;
@@ -223,14 +223,14 @@ function() {
 
     function plain() {}
 
-    function bin2hex(str){
-        return map(str,function(x){
+    function bin2hex(str) {
+        return map(str, function(x) {
             return x.charCodeAt(0).toString(16);
         }).join('');
     }
 
-    function random(begin,end){
-        return Math.floor(Math.random()*(end-begin))+begin;
+    function random(begin, end) {
+        return Math.floor(Math.random() * (end - begin)) + begin;
     }
 
     function dispatch() {
@@ -283,20 +283,24 @@ function() {
                 thunks.push(onFulfilled);
                 errors.push(onRejected);
             }
-            if (state === 'fulfilled' && f) {
+            if (state === 'fulfilled') {
                 setTimeout(function() {
-                    next(next_value, value, [onFulfilled], 0);
+                    onFulfilled(value);
                 }, 0);
             }
-            if (state === 'rejected' && r) {
+            if (state === 'rejected') {
                 setTimeout(function() {
-                    next(next_error, value, [onRejected], 1);
+                    onRejected(value);
                 }, 0);
             }
         }
 
         function wrapper(f, flag, resolve, reject) {
-            var k = flag ? function(x) { reject(x) } : function(x) { resolve(x) };
+            var k = flag ? function(x) {
+                reject(x)
+            } : function(x) {
+                resolve(x)
+            };
             return isFunction(f) ? function(x) {
                 try {
                     _call(f(x), resolve, reject);
@@ -346,17 +350,17 @@ function() {
 
     $1Promise.all = function(args) {
         return new $1Promise(function(resolve, reject) {
-            for (var i = 0, l = args.length, all = new Array(l),allResults=[]; i < l; ++i) {
-                !function(i) {
-                    var tmp=args[i].__type__===plain?args[i]:$1Promise.resolve(args[i]);
+            for (var i = 0, l = args.length, all = new Array(l), allResults = []; i < l; ++i) {
+                ! function(i) {
+                    var tmp = args[i].__type__ === plain ? args[i] : $1Promise.resolve(args[i]);
                     tmp.then(function(value) {
-                        all[i]=true;
-                        allResults[i]=value;
-                        var flag=true;
-                        for(var j=0,l=args.length;i<l;++i){
-                            if(!all[i])flag=false;
+                        all[i] = true;
+                        allResults[i] = value;
+                        var flag = true;
+                        for (var j = 0, l = args.length; i < l; ++i) {
+                            if (!all[i]) flag = false;
                         }
-                        if(flag)resolve(allResults);
+                        if (flag) resolve(allResults);
                     }, function(error) {
                         reject(error);
                     });
@@ -717,7 +721,7 @@ function() {
         ];
         maybeArray = map(maybeArray, function(i) {
             i = parseInt(i);
-            if (!(i && i > 0)) return false;
+            if (!(i && i > 0)) return null;
             return i;
         });
         return min(maybeArray);
