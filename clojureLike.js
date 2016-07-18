@@ -91,9 +91,7 @@ function() {
     var call = uncurrying(_call);
     var has = uncurrying(_has);
     var $1slice = uncurrying(_$1slice);
-    var toArray = fcheck(curry2r($1slice)(0), function(x) {
-        return existy(x)
-    }, []);
+    var toArray = fcheck(curry2r($1slice)(0), existy, []);
     var keys = fcheck(dispatch(_keys, $1keys),
         existy,
         alwayslist0
